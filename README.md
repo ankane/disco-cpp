@@ -8,7 +8,7 @@
 
 :tada: Zero dependencies
 
-[![Build Status](https://github.com/ankane/disco-cpp/workflows/build/badge.svg?branch=master)](https://github.com/ankane/disco-cpp/actions)
+[![Build Status](https://github.com/ankane/disco-cpp/actions/workflows/build.yml/badge.svg)](https://github.com/ankane/disco-cpp/actions)
 
 ## Installation
 
