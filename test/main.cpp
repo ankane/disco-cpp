@@ -8,7 +8,11 @@
 using disco::Dataset;
 using disco::Recommender;
 
-template<class T> void assert_eq(std::span<T> a, const std::vector<T>& b) {
+template<class T> void assert_eq(const std::vector<T>& a, const std::vector<T>& b) {
+    assert(std::equal(a.begin(), a.end(), b.begin(), b.end()));
+}
+
+template<class T> void assert_eq(std::span<const T> a, const std::vector<T>& b) {
     assert(std::equal(a.begin(), a.end(), b.begin(), b.end()));
 }
 
@@ -30,14 +34,14 @@ void test_rated() {
         item_ids.push_back(v.first);
     }
     std::sort(item_ids.begin(), item_ids.end());
-    assert_eq(std::span{item_ids}, {"E", "F"});
+    assert_eq(item_ids, {"E", "F"});
 
     item_ids.clear();
     for (auto& v : recommender.user_recs(2, 5)) {
         item_ids.push_back(v.first);
     }
     std::sort(item_ids.begin(), item_ids.end());
-    assert_eq(std::span{item_ids}, {"A", "B"});
+    assert_eq(item_ids, {"A", "B"});
 }
 
 void test_item_recs_same_score() {
@@ -51,7 +55,7 @@ void test_item_recs_same_score() {
     for (auto& v : recommender.item_recs("A", 5)) {
         item_ids.push_back(v.first);
     }
-    assert_eq(std::span{item_ids}, {"B", "C"});
+    assert_eq(item_ids, {"B", "C"});
 }
 
 void test_ids() {
