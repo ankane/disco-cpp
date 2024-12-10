@@ -366,7 +366,7 @@ public:
     }
 
     std::vector<std::pair<T, float>> similar_users(const T& user_id, size_t count = 5) {
-        return similar<U>(
+        return similar<T>(
             user_map_,
             user_factors_,
             user_norms_,
