@@ -12,7 +12,7 @@
 
 ## Installation
 
-Add [the header](https://raw.githubusercontent.com/ankane/disco-cpp/v0.1.0/include/disco.hpp) to your project and include it (supports C++20 and greater)
+Add [the header](https://raw.githubusercontent.com/ankane/disco-cpp/v0.1.1/include/disco.hpp) to your project and include it (supports C++20 and greater)
 
 ```cpp
 #include "disco.hpp"
