@@ -158,7 +158,7 @@ int main() {
 
 Save recommendations to your database.
 
-Alternatively, you can store only the factors and use a library like [pgvector-cpp](https://github.com/pgvector/pgvector-cpp).
+Alternatively, you can store only the factors and use a library like [pgvector-cpp](https://github.com/pgvector/pgvector-cpp). See an [example](https://github.com/pgvector/pgvector-cpp/blob/master/examples/disco/example.cpp).
 
 ## Algorithms
 
