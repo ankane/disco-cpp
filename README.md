@@ -12,13 +12,15 @@
 
 ## Installation
 
-Add [the header](https://raw.githubusercontent.com/ankane/disco-cpp/v0.1.1/include/disco.hpp) to your project and include it (supports C++20 and greater)
+Add [the header](https://raw.githubusercontent.com/ankane/disco-cpp/v0.1.1/include/disco.hpp) to your project (supports C++20 and greater).
+
+## Getting Started
+
+Include the header
 
 ```cpp
 #include "disco.hpp"
 ```
-
-## Getting Started
 
 Prep your data in the format `user_id, item_id, value`
 
