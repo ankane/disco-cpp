@@ -14,7 +14,7 @@
 
 Add [the header](https://raw.githubusercontent.com/ankane/disco-cpp/v0.1.1/include/disco.hpp) to your project (supports C++20 and greater).
 
-There is also experimental support for CMake and FetchContent:
+There is also support for CMake and FetchContent:
 
 ```cmake
 include(FetchContent)
