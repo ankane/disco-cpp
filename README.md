@@ -19,7 +19,7 @@ There is also support for CMake and FetchContent:
 ```cmake
 include(FetchContent)
 
-FetchContent_Declare(disco GIT_REPOSITORY https://github.com/ankane/disco.git GIT_TAG v0.1.2)
+FetchContent_Declare(disco GIT_REPOSITORY https://github.com/ankane/disco-cpp.git GIT_TAG v0.1.2)
 FetchContent_MakeAvailable(disco)
 
 target_link_libraries(app PRIVATE disco::disco)
