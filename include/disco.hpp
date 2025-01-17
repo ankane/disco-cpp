@@ -259,15 +259,19 @@ template<class T> std::vector<std::pair<T, float>> similar(const Map<T>& map, co
 
 }
 
+/// A dataset.
 template<class T, class U> class Dataset
 {
 public:
+    /// Creates a new dataset.
     Dataset() {}
 
+    /// Adds a rating to the dataset.
     void push(T user_id, U item_id, float value) {
         data_.emplace_back(Rating<T, U>{user_id, item_id, value});
     }
 
+    /// Returns the number of ratings in the dataset.
     size_t size() const {
         return data_.size();
     }
@@ -275,44 +279,61 @@ public:
     std::vector<Rating<T, U>> data_;
 };
 
+/// Information about a training iteration.
 struct FitInfo
 {
+    /// The iteration.
     size_t iteration;
+    /// The training loss.
     float train_loss;
 };
 
+/// Recommender options.
 struct RecommenderOptions
 {
+    /// Sets the number of factors.
     size_t factors = 8;
+    /// Sets the number of iterations.
     size_t iterations = 20;
+    /// Sets the regularization.
     // there is regularization by default
     // but explicit and implicit have different defaults
     std::optional<float> regularization = std::nullopt;
+    /// Sets the learning rate.
     float learning_rate = 0.1;
+    /// Sets alpha.
     float alpha = 40.0;
+    /// Sets the callback for each iteration.
     std::function<void (const FitInfo&)> callback = nullptr;
+    /// Sets the random seed.
     std::optional<uint64_t> seed = std::nullopt;
 };
 
+/// A recommender.
 template<class T, class U> class Recommender
 {
 public:
+    /// Creates a recommender with explicit feedback.
     static Recommender<T, U> fit_explicit(const Dataset<T, U>& train_set) {
         return fit(train_set, RecommenderOptions(), false);
     }
 
+    /// Creates a recommender with explicit feedback.
     static Recommender<T, U> fit_explicit(const Dataset<T, U>& train_set, const RecommenderOptions& options) {
         return fit(train_set, options, false);
     }
 
+    /// Creates a recommender with implicit feedback.
     static Recommender<T, U> fit_implicit(const Dataset<T, U>& train_set) {
         return fit(train_set, RecommenderOptions(), true);
     }
 
+    /// Creates a recommender with implicit feedback.
     static Recommender<T, U> fit_implicit(const Dataset<T, U>& train_set, const RecommenderOptions& options) {
         return fit(train_set, options, true);
     }
 
+    /// Returns the predicted rating for a specific user and item.
     float predict(const T& user_id, const U& item_id) {
         auto i = user_map_.get(user_id);
         if (!i) {
@@ -327,6 +348,7 @@ public:
         return dot(user_factors_.row(*i), item_factors_.row(*j));
     }
 
+    /// Returns recommendations for a user.
     std::vector<std::pair<U, float>> user_recs(const T& user_id, size_t count = 5) {
         auto io = user_map_.get(user_id);
         if (!io) {
@@ -359,6 +381,7 @@ public:
         return recs;
     }
 
+    /// Returns recommendations for an item.
     std::vector<std::pair<U, float>> item_recs(const U& item_id, size_t count = 5) {
         return similar<U>(
             item_map_,
@@ -369,6 +392,7 @@ public:
         );
     }
 
+    /// Returns similar users.
     std::vector<std::pair<T, float>> similar_users(const T& user_id, size_t count = 5) {
         return similar<T>(
             user_map_,
@@ -379,14 +403,17 @@ public:
         );
     }
 
+    /// Returns user ids.
     std::span<const T> user_ids() {
         return user_map_.ids();
     }
 
+    /// Returns item ids.
     std::span<const U> item_ids() {
         return item_map_.ids();
     }
 
+    /// Returns factors for a specific user.
     std::optional<std::span<const float>> user_factors(const T& user_id) {
         auto i = user_map_.get(user_id);
         if (i) {
@@ -395,6 +422,7 @@ public:
         return std::nullopt;
     }
 
+    /// Returns factors for a specific item.
     std::optional<std::span<const float>> item_factors(const U& item_id) {
         auto i = item_map_.get(item_id);
         if (i) {
@@ -403,6 +431,7 @@ public:
         return std::nullopt;
     }
 
+    /// Returns the global mean.
     float global_mean() {
         return global_mean_;
     }
