@@ -20,27 +20,13 @@
 
 namespace disco {
 
+namespace {
+
 template<class T, class U> struct Rating
 {
     T user_id;
     U item_id;
     float value;
-};
-
-template<class T, class U> class Dataset
-{
-public:
-    Dataset() {}
-
-    void push(T user_id, U item_id, float value) {
-        data_.emplace_back(Rating<T, U>{user_id, item_id, value});
-    }
-
-    size_t size() const {
-        return data_.size();
-    }
-
-    std::vector<Rating<T, U>> data_;
 };
 
 template<class T> class Map
@@ -270,6 +256,24 @@ template<class T> std::vector<std::pair<T, float>> similar(const Map<T>& map, co
     }
     return recs;
 }
+
+}
+
+template<class T, class U> class Dataset
+{
+public:
+    Dataset() {}
+
+    void push(T user_id, U item_id, float value) {
+        data_.emplace_back(Rating<T, U>{user_id, item_id, value});
+    }
+
+    size_t size() const {
+        return data_.size();
+    }
+
+    std::vector<Rating<T, U>> data_;
+};
 
 struct FitInfo
 {
