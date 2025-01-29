@@ -1,12 +1,12 @@
 # Disco C++
 
-:fire: Recommendations for C++ using collaborative filtering
+🔥 Recommendations for C++ using collaborative filtering
 
 - Supports user-based and item-based recommendations
 - Works with explicit and implicit feedback
 - Uses high-performance matrix factorization
 
-:tada: Zero dependencies
+🎉 Zero dependencies
 
 [![Build Status](https://github.com/ankane/disco-cpp/actions/workflows/build.yml/badge.svg)](https://github.com/ankane/disco-cpp/actions)
 
