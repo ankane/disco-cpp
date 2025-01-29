@@ -276,6 +276,7 @@ public:
         return data_.size();
     }
 
+    /// @private
     std::vector<Rating<T, U>> data_;
 };
 
