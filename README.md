@@ -210,7 +210,7 @@ Note: `train_loss` is not available for implicit feedback
 Collaborative filtering suffers from the [cold start problem](https://en.wikipedia.org/wiki/Cold_start_(recommender_systems)). It’s unable to make good recommendations without data on a user or item, which is problematic for new users and items.
 
 ```cpp
-recommender.user_recs(new_user_id, 5); // returns empty array
+recommender.user_recs(new_user_id); // returns empty array
 ```
 
 There are a number of ways to deal with this, but here are some common ones:
