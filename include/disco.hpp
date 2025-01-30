@@ -315,22 +315,12 @@ template<class T, class U> class Recommender
 {
 public:
     /// Creates a recommender with explicit feedback.
-    static Recommender<T, U> fit_explicit(const Dataset<T, U>& train_set) {
-        return fit(train_set, RecommenderOptions(), false);
-    }
-
-    /// Creates a recommender with explicit feedback.
-    static Recommender<T, U> fit_explicit(const Dataset<T, U>& train_set, const RecommenderOptions& options) {
+    static Recommender<T, U> fit_explicit(const Dataset<T, U>& train_set, const RecommenderOptions& options = RecommenderOptions()) {
         return fit(train_set, options, false);
     }
 
     /// Creates a recommender with implicit feedback.
-    static Recommender<T, U> fit_implicit(const Dataset<T, U>& train_set) {
-        return fit(train_set, RecommenderOptions(), true);
-    }
-
-    /// Creates a recommender with implicit feedback.
-    static Recommender<T, U> fit_implicit(const Dataset<T, U>& train_set, const RecommenderOptions& options) {
+    static Recommender<T, U> fit_implicit(const Dataset<T, U>& train_set, const RecommenderOptions& options = RecommenderOptions()) {
         return fit(train_set, options, true);
     }
 
