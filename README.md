@@ -67,13 +67,19 @@ auto recommender = Recommender<std::string, std::string>::fit_implicit(data);
 Get user-based recommendations - “users like you also liked”
 
 ```cpp
-recommender.user_recs(user_id, 5);
+recommender.user_recs(user_id);
 ```
 
 Get item-based recommendations - “users who liked this item also liked”
 
 ```cpp
-recommender.item_recs(item_id, 5);
+recommender.item_recs(item_id);
+```
+
+Use the `count` option to specify the number of recommendations (default is 5)
+
+```cpp
+recommender.user_recs(user_id, 5);
 ```
 
 Get predicted ratings for a specific user and item
@@ -85,7 +91,7 @@ recommender.predict(user_id, item_id);
 Get similar users
 
 ```cpp
-recommender.similar_users(user_id, 5);
+recommender.similar_users(user_id);
 ```
 
 ## Examples
