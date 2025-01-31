@@ -22,14 +22,14 @@ namespace disco {
 
 namespace {
 
-template<class T, class U> struct Rating
+template<typename T, typename U> struct Rating
 {
     T user_id;
     U item_id;
     float value;
 };
 
-template<class T> class Map
+template<typename T> class Map
 {
 public:
     size_t add(const T& id) {
@@ -219,13 +219,13 @@ inline std::vector<size_t> sample(std::mt19937_64& prng, size_t n) {
     return v;
 }
 
-template<class T> void truncate(std::vector<T>& vec, size_t count) {
+template<typename T> void truncate(std::vector<T>& vec, size_t count) {
     if (vec.size() > count) {
         vec.resize(count);
     }
 }
 
-template<class T> std::vector<std::pair<T, float>> similar(const Map<T>& map, const Matrix& factors, const std::vector<float>& norms, const T& id, size_t count) {
+template<typename T> std::vector<std::pair<T, float>> similar(const Map<T>& map, const Matrix& factors, const std::vector<float>& norms, const T& id, size_t count) {
     auto io = map.get(id);
     if (!io) {
         return std::vector<std::pair<T, float>>();
@@ -260,7 +260,7 @@ template<class T> std::vector<std::pair<T, float>> similar(const Map<T>& map, co
 }
 
 /// A dataset.
-template<class T, class U> class Dataset
+template<typename T, typename U> class Dataset
 {
 public:
     /// Creates a new dataset.
@@ -311,7 +311,7 @@ struct RecommenderOptions
 };
 
 /// A recommender.
-template<class T, class U> class Recommender
+template<typename T, typename U> class Recommender
 {
 public:
     /// Creates a recommender with explicit feedback.
