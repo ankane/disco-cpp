@@ -56,11 +56,11 @@ public:
         return vec_.at(index);
     }
 
-    size_t size() {
+    size_t size() const {
         return vec_.size();
     }
 
-    std::span<const T> ids() {
+    std::span<const T> ids() const {
         return std::span{vec_};
     }
 
@@ -325,7 +325,7 @@ public:
     }
 
     /// Returns the predicted rating for a specific user and item.
-    float predict(const T& user_id, const U& item_id) {
+    float predict(const T& user_id, const U& item_id) const {
         auto i = user_map_.get(user_id);
         if (!i) {
             return global_mean_;
@@ -340,7 +340,7 @@ public:
     }
 
     /// Returns recommendations for a user.
-    std::vector<std::pair<U, float>> user_recs(const T& user_id, size_t count = 5) {
+    std::vector<std::pair<U, float>> user_recs(const T& user_id, size_t count = 5) const {
         auto io = user_map_.get(user_id);
         if (!io) {
             return std::vector<std::pair<U, float>>();
@@ -373,7 +373,7 @@ public:
     }
 
     /// Returns recommendations for an item.
-    std::vector<std::pair<U, float>> item_recs(const U& item_id, size_t count = 5) {
+    std::vector<std::pair<U, float>> item_recs(const U& item_id, size_t count = 5) const {
         return similar<U>(
             item_map_,
             item_factors_,
@@ -384,7 +384,7 @@ public:
     }
 
     /// Returns similar users.
-    std::vector<std::pair<T, float>> similar_users(const T& user_id, size_t count = 5) {
+    std::vector<std::pair<T, float>> similar_users(const T& user_id, size_t count = 5) const {
         return similar<T>(
             user_map_,
             user_factors_,
@@ -395,17 +395,17 @@ public:
     }
 
     /// Returns user ids.
-    std::span<const T> user_ids() {
+    std::span<const T> user_ids() const {
         return user_map_.ids();
     }
 
     /// Returns item ids.
-    std::span<const U> item_ids() {
+    std::span<const U> item_ids() const {
         return item_map_.ids();
     }
 
     /// Returns factors for a specific user.
-    std::optional<std::span<const float>> user_factors(const T& user_id) {
+    std::optional<std::span<const float>> user_factors(const T& user_id) const {
         auto i = user_map_.get(user_id);
         if (i) {
             return user_factors_.row(*i);
@@ -414,7 +414,7 @@ public:
     }
 
     /// Returns factors for a specific item.
-    std::optional<std::span<const float>> item_factors(const U& item_id) {
+    std::optional<std::span<const float>> item_factors(const U& item_id) const {
         auto i = item_map_.get(item_id);
         if (i) {
             return item_factors_.row(*i);
@@ -423,7 +423,7 @@ public:
     }
 
     /// Returns the global mean.
-    float global_mean() {
+    float global_mean() const {
         return global_mean_;
     }
 
