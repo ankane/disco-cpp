@@ -12,14 +12,14 @@
 
 ## Installation
 
-Add [the header](https://raw.githubusercontent.com/ankane/disco-cpp/v0.1.2/include/disco.hpp) to your project (supports C++20 and greater).
+Add [the header](https://raw.githubusercontent.com/ankane/disco-cpp/v0.1.3/include/disco.hpp) to your project (supports C++20 and greater).
 
 There is also support for CMake and FetchContent:
 
 ```cmake
 include(FetchContent)
 
-FetchContent_Declare(disco GIT_REPOSITORY https://github.com/ankane/disco-cpp.git GIT_TAG v0.1.2)
+FetchContent_Declare(disco GIT_REPOSITORY https://github.com/ankane/disco-cpp.git GIT_TAG v0.1.3)
 FetchContent_MakeAvailable(disco)
 
 target_link_libraries(app PRIVATE disco::disco)

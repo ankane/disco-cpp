@@ -1,5 +1,5 @@
 /*!
- * Disco C++ v0.1.2
+ * Disco C++ v0.1.3
  * https://github.com/ankane/disco-cpp
  * MIT License
  */
