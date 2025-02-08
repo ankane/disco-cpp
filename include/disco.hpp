@@ -167,7 +167,7 @@ inline void least_squares_cg(std::vector<std::vector<std::pair<size_t, float>>>&
         for (auto [i, confidence] : row_vec) {
             scaled_add(
                 r,
-                confidence - (confidence - 1.0) * dot(y.row(i), xi),
+                confidence - (confidence - 1.0f) * dot(y.row(i), xi),
                 y.row(i)
             );
         }
@@ -180,7 +180,7 @@ inline void least_squares_cg(std::vector<std::vector<std::pair<size_t, float>>>&
             std::span sp(p);
             auto ap = yty.dot(sp);
             for (auto [i, confidence] : row_vec) {
-                scaled_add(ap, (confidence - 1.0) * dot(y.row(i), p), y.row(i));
+                scaled_add(ap, (confidence - 1.0f) * dot(y.row(i), p), y.row(i));
             }
 
             // standard CG update
@@ -212,7 +212,7 @@ inline std::vector<size_t> sample(std::mt19937_64& prng, size_t n) {
     // Fisher–Yates shuffle
     std::uniform_real_distribution<float> dist(0, 1);
     for (size_t i = n - 1; i >= 1; i--) {
-        size_t j = dist(prng) * (i + 1);
+        size_t j = (size_t) (dist(prng) * (i + 1));
         std::swap(v[i], v[j]);
     }
 
@@ -301,9 +301,9 @@ struct RecommenderOptions
     // but explicit and implicit have different defaults
     std::optional<float> regularization = std::nullopt;
     /// Sets the learning rate.
-    float learning_rate = 0.1;
+    float learning_rate = 0.1f;
     /// Sets alpha.
-    float alpha = 40.0;
+    float alpha = 40.0f;
     /// Sets the callback for each iteration.
     std::function<void (const FitInfo&)> callback = nullptr;
     /// Sets the random seed.
@@ -480,7 +480,7 @@ private:
                     ciu.emplace_back(std::vector<std::pair<size_t, float>>());
                 }
 
-                float confidence = 1.0 + options.alpha * rating.value;
+                float confidence = 1.0f + options.alpha * rating.value;
                 cui[u].emplace_back(std::make_pair(i, confidence));
                 ciu[i].emplace_back(std::make_pair(u, confidence));
             } else {
@@ -500,9 +500,9 @@ private:
         size_t users = user_map.size();
         size_t items = item_map.size();
 
-        float global_mean = implicit ? 0.0 : (std::reduce(values.begin(), values.end()) / values.size());
+        float global_mean = implicit ? 0.0f : (std::reduce(values.begin(), values.end()) / values.size());
 
-        float end_range = implicit ? 0.01 : 0.1;
+        float end_range = implicit ? 0.01f : 0.1f;
 
         std::mt19937_64 prng;
         if (options.seed) {
@@ -579,8 +579,8 @@ private:
                     float g_hat = 0.0;
                     float h_hat = 0.0;
 
-                    float nu = learning_rate * (1.0 / std::sqrt(g_slow[u]));
-                    float nv = learning_rate * (1.0 / std::sqrt(h_slow[v]));
+                    float nu = learning_rate * (1.0f / std::sqrt(g_slow[u]));
+                    float nv = learning_rate * (1.0f / std::sqrt(h_slow[v]));
 
                     for (size_t d = 0; d < ks; d++) {
                         float gud = -e * qv[d] + lambda * pu[d];
@@ -602,8 +602,8 @@ private:
                         float g_hat = 0.0;
                         float h_hat = 0.0;
 
-                        float nu = learning_rate * (1.0 / std::sqrt(g_fast[u]));
-                        float nv = learning_rate * (1.0 / std::sqrt(h_fast[v]));
+                        float nu = learning_rate * (1.0f / std::sqrt(g_fast[u]));
+                        float nv = learning_rate * (1.0f / std::sqrt(h_fast[v]));
 
                         for (size_t d = ks; d < k; d++) {
                             float gud = -e * qv[d] + lambda * pu[d];
