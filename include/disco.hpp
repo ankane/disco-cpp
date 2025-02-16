@@ -33,15 +33,11 @@ template<typename T> class Map
 {
 public:
     size_t add(const T& id) {
-        auto search = map_.find(id);
-        if (search != map_.end()) {
-            return search->second;
-        } else {
-            size_t i = vec_.size();
-            map_.emplace(std::make_pair(id, i));
+        auto [it, inserted] = map_.try_emplace(id, vec_.size());
+        if (inserted) {
             vec_.push_back(id);
-            return i;
         }
+        return it->second;
     }
 
     std::optional<size_t> get(const T& id) const {
