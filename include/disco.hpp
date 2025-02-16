@@ -43,7 +43,7 @@ public:
     std::optional<size_t> get(const T& id) const {
         auto search = map_.find(id);
         if (search != map_.end()) {
-            return std::optional<size_t>{search->second};
+            return search->second;
         }
         return std::nullopt;
     }
