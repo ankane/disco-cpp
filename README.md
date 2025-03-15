@@ -82,7 +82,7 @@ Use the `count` option to specify the number of recommendations (default is 5)
 recommender.user_recs(user_id, 5);
 ```
 
-Get predicted ratings for a specific user and item
+Get the predicted rating for a specific user and item
 
 ```cpp
 recommender.predict(user_id, item_id);
