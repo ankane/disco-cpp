@@ -16,6 +16,7 @@
 #include <set>
 #include <span>
 #include <unordered_map>
+#include <utility>
 #include <vector>
 
 namespace disco {
@@ -208,7 +209,7 @@ inline std::vector<size_t> sample(std::mt19937_64& prng, size_t n) {
     // Fisher–Yates shuffle
     std::uniform_real_distribution<float> dist(0, 1);
     for (size_t i = n - 1; i >= 1; i--) {
-        size_t j = (size_t) (dist(prng) * (i + 1));
+        size_t j = static_cast<size_t>(dist(prng) * (i + 1));
         std::swap(v[i], v[j]);
     }
 
@@ -301,7 +302,7 @@ struct RecommenderOptions
     /// Sets alpha.
     float alpha = 40.0f;
     /// Sets the callback for each iteration.
-    std::function<void (const FitInfo&)> callback = nullptr;
+    std::function<void(const FitInfo&)> callback = nullptr;
     /// Sets the random seed.
     std::optional<uint64_t> seed = std::nullopt;
 };
@@ -552,7 +553,7 @@ private:
             float learning_rate = options.learning_rate;
             float lambda = options.regularization.value_or(0.1);
             size_t k = factors;
-            size_t ks = std::max((size_t) std::round(k * 0.08), (size_t) 1);
+            size_t ks = std::max(static_cast<size_t>(std::round(k * 0.08)), static_cast<size_t>(1));
 
             std::vector<float> g_slow(users, 1.0);
             std::vector<float> g_fast(users, 1.0);
