@@ -21,7 +21,7 @@
 
 namespace disco {
 
-namespace {
+namespace detail {
 
 template<typename T, typename U> struct Rating {
     T user_id;
@@ -30,7 +30,7 @@ template<typename T, typename U> struct Rating {
 };
 
 template<typename T> class Map {
-public:
+  public:
     size_t add(const T& id) {
         auto [it, inserted] = map_.try_emplace(id, vec_.size());
         if (inserted) {
@@ -64,7 +64,7 @@ public:
 };
 
 class Matrix {
-public:
+  public:
     size_t rows_;
     size_t cols_;
     std::vector<float> data_;
@@ -239,9 +239,9 @@ template<typename T> std::vector<std::pair<T, float>> similar(const Map<T>& map,
     std::sort(predictions.begin(), predictions.end(), [](const std::pair<size_t, float>& a, const std::pair<size_t, float>& b) {
         return a.second > b.second;
     });
-    truncate(predictions, count + 1);
+    detail::truncate(predictions, count + 1);
     std::erase_if(predictions, [&i](const std::pair<size_t, float>& v) { return v.first == i; });
-    truncate(predictions, count);
+    detail::truncate(predictions, count);
 
     std::vector<std::pair<T, float>> recs;
     recs.reserve(predictions.size());
@@ -251,17 +251,17 @@ template<typename T> std::vector<std::pair<T, float>> similar(const Map<T>& map,
     return recs;
 }
 
-}
+} // namespace detail
 
 /// A dataset.
 template<typename T, typename U> class Dataset {
-public:
+  public:
     /// Creates a new dataset.
     Dataset() {}
 
     /// Adds a rating to the dataset.
     void push(T user_id, U item_id, float value) {
-        data_.emplace_back(Rating<T, U>{user_id, item_id, value});
+        data_.emplace_back(detail::Rating<T, U>{user_id, item_id, value});
     }
 
     /// Returns the number of ratings in the dataset.
@@ -270,7 +270,7 @@ public:
     }
 
     /// @private
-    std::vector<Rating<T, U>> data_;
+    std::vector<detail::Rating<T, U>> data_;
 };
 
 /// Information about a training iteration.
@@ -303,7 +303,7 @@ struct RecommenderOptions {
 
 /// A recommender.
 template<typename T, typename U> class Recommender {
-public:
+  public:
     /// Creates a recommender with explicit feedback.
     static Recommender<T, U> fit_explicit(const Dataset<T, U>& train_set, const RecommenderOptions& options = RecommenderOptions()) {
         return fit(train_set, options, false);
@@ -344,15 +344,15 @@ public:
         std::vector<std::pair<size_t, float>> predictions;
         predictions.reserve(item_factors_.rows_);
         for (size_t j = 0; j < item_factors_.rows_; j++) {
-            float score = dot(item_factors_.row(j), query);
+            float score = detail::dot(item_factors_.row(j), query);
             predictions.emplace_back(std::make_pair(j, score));
         }
         std::sort(predictions.begin(), predictions.end(), [](const std::pair<size_t, float>& a, const std::pair<size_t, float>& b) {
             return a.second > b.second;
         });
-        truncate(predictions, count + rated.size());
+        detail::truncate(predictions, count + rated.size());
         std::erase_if(predictions, [&](const std::pair<size_t, float>& v) { return rated.contains(v.first); });
-        truncate(predictions, count);
+        detail::truncate(predictions, count);
 
         std::vector<std::pair<U, float>> recs;
         recs.reserve(predictions.size());
@@ -417,21 +417,21 @@ public:
         return global_mean_;
     }
 
-private:
-    Map<T> user_map_;
-    Map<U> item_map_;
+  private:
+    detail::Map<T> user_map_;
+    detail::Map<U> item_map_;
     std::unordered_map<size_t, std::set<size_t>> rated_;
     float global_mean_;
-    Matrix user_factors_;
-    Matrix item_factors_;
+    detail::Matrix user_factors_;
+    detail::Matrix item_factors_;
     std::vector<float> user_norms_;
     std::vector<float> item_norms_;
 
-    Recommender(Map<T> user_map, Map<U> item_map, std::unordered_map<size_t, std::set<size_t>> rated, float global_mean, Matrix user_factors, Matrix item_factors)
+    Recommender(detail::Map<T> user_map, detail::Map<U> item_map, std::unordered_map<size_t, std::set<size_t>> rated, float global_mean, detail::Matrix user_factors, detail::Matrix item_factors)
         : user_map_{user_map}, item_map_{item_map}, rated_{rated}, global_mean_{global_mean}, user_factors_{user_factors}, item_factors_{item_factors} {}
 
-    static Matrix create_factors(size_t rows, size_t cols, std::mt19937_64& prng, float end_range) {
-        auto m = Matrix(rows, cols);
+    static detail::Matrix create_factors(size_t rows, size_t cols, std::mt19937_64& prng, float end_range) {
+        auto m = detail::Matrix(rows, cols);
         std::uniform_real_distribution<float> dist(0, end_range);
         for (size_t i = 0; i < m.data_.size(); i++) {
             m.data_[i] = dist(prng);
@@ -442,8 +442,8 @@ private:
     static Recommender<T, U> fit(const Dataset<T, U>& train_set, const RecommenderOptions& options, bool implicit) {
         size_t factors = options.factors;
 
-        Map<T> user_map;
-        Map<U> item_map;
+        detail::Map<T> user_map;
+        detail::Map<U> item_map;
         std::unordered_map<size_t, std::set<size_t>> rated;
 
         std::vector<size_t> row_inds;
@@ -499,8 +499,8 @@ private:
             prng.seed(*options.seed);
         }
 
-        Matrix user_factors = create_factors(users, factors, prng, end_range);
-        Matrix item_factors = create_factors(items, factors, prng, end_range);
+        detail::Matrix user_factors = create_factors(users, factors, prng, end_range);
+        detail::Matrix item_factors = create_factors(items, factors, prng, end_range);
 
         auto recommender = Recommender<T, U>(
             user_map,
@@ -557,13 +557,13 @@ private:
                 float train_loss = 0.0;
 
                 // shuffle for each iteration
-                for (auto& j : sample(prng, train_set.size())) {
+                for (auto& j : detail::sample(prng, train_set.size())) {
                     size_t u = row_inds[j];
                     size_t v = col_inds[j];
 
                     auto pu = recommender.user_factors_.row_mut(u);
                     auto qv = recommender.item_factors_.row_mut(v);
-                    float e = values[j] - dot(pu, qv);
+                    float e = values[j] - detail::dot(pu, qv);
 
                     // slow learner
                     float g_hat = 0.0;
@@ -625,15 +625,15 @@ private:
         }
 
         for (size_t i = 0; i < users; i++) {
-            recommender.user_norms_.push_back(norm(recommender.user_factors_.row(i)));
+            recommender.user_norms_.push_back(detail::norm(recommender.user_factors_.row(i)));
         }
 
         for (size_t i = 0; i < items; i++) {
-            recommender.item_norms_.push_back(norm(recommender.item_factors_.row(i)));
+            recommender.item_norms_.push_back(detail::norm(recommender.item_factors_.row(i)));
         }
 
         return recommender;
     }
 };
 
-}
+} // namespace disco
