@@ -23,15 +23,13 @@ namespace disco {
 
 namespace {
 
-template<typename T, typename U> struct Rating
-{
+template<typename T, typename U> struct Rating {
     T user_id;
     U item_id;
     float value;
 };
 
-template<typename T> class Map
-{
+template<typename T> class Map {
 public:
     size_t add(const T& id) {
         auto [it, inserted] = map_.try_emplace(id, vec_.size());
@@ -65,8 +63,7 @@ public:
     std::vector<T> vec_;
 };
 
-class Matrix
-{
+class Matrix {
 public:
     size_t rows_;
     size_t cols_;
@@ -257,8 +254,7 @@ template<typename T> std::vector<std::pair<T, float>> similar(const Map<T>& map,
 }
 
 /// A dataset.
-template<typename T, typename U> class Dataset
-{
+template<typename T, typename U> class Dataset {
 public:
     /// Creates a new dataset.
     Dataset() {}
@@ -278,8 +274,7 @@ public:
 };
 
 /// Information about a training iteration.
-struct FitInfo
-{
+struct FitInfo {
     /// The iteration.
     size_t iteration;
     /// The training loss.
@@ -287,8 +282,7 @@ struct FitInfo
 };
 
 /// Recommender options.
-struct RecommenderOptions
-{
+struct RecommenderOptions {
     /// Sets the number of factors.
     size_t factors = 8;
     /// Sets the number of iterations.
@@ -308,8 +302,7 @@ struct RecommenderOptions
 };
 
 /// A recommender.
-template<typename T, typename U> class Recommender
-{
+template<typename T, typename U> class Recommender {
 public:
     /// Creates a recommender with explicit feedback.
     static Recommender<T, U> fit_explicit(const Dataset<T, U>& train_set, const RecommenderOptions& options = RecommenderOptions()) {
