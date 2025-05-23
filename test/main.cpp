@@ -2,6 +2,7 @@
 #include <cassert>
 #include <span>
 #include <string>
+#include <vector>
 
 #include "../include/disco.hpp"
 
