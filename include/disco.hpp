@@ -236,7 +236,7 @@ template<typename T> std::vector<std::pair<T, float>> similar(const Map<T>& map,
         float score = dot(row, query) / (norms.at(j) * query_norm);
         predictions.emplace_back(std::make_pair(j, score));
     }
-    std::sort(predictions.begin(), predictions.end(), [](const std::pair<size_t, float>& a, const std::pair<size_t, float>& b) {
+    std::ranges::sort(predictions, [](const std::pair<size_t, float>& a, const std::pair<size_t, float>& b) {
         return a.second > b.second;
     });
     detail::truncate(predictions, count + 1);
@@ -347,7 +347,7 @@ template<typename T, typename U> class Recommender {
             float score = detail::dot(item_factors_.row(j), query);
             predictions.emplace_back(std::make_pair(j, score));
         }
-        std::sort(predictions.begin(), predictions.end(), [](const std::pair<size_t, float>& a, const std::pair<size_t, float>& b) {
+        std::ranges::sort(predictions, [](const std::pair<size_t, float>& a, const std::pair<size_t, float>& b) {
             return a.second > b.second;
         });
         detail::truncate(predictions, count + rated.size());

@@ -34,14 +34,14 @@ void test_rated() {
     for (auto& v : recommender.user_recs(1, 5)) {
         item_ids.push_back(v.first);
     }
-    std::sort(item_ids.begin(), item_ids.end());
+    std::ranges::sort(item_ids);
     assert_eq(item_ids, {"E", "F"});
 
     item_ids.clear();
     for (auto& v : recommender.user_recs(2, 5)) {
         item_ids.push_back(v.first);
     }
-    std::sort(item_ids.begin(), item_ids.end());
+    std::ranges::sort(item_ids);
     assert_eq(item_ids, {"A", "B"});
 }
 
