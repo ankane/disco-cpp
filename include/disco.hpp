@@ -206,7 +206,7 @@ inline std::vector<size_t> sample(std::mt19937_64& prng, size_t n) {
     // Fisher–Yates shuffle
     std::uniform_real_distribution<float> dist(0, 1);
     for (size_t i = n - 1; i >= 1; i--) {
-        size_t j = static_cast<size_t>(dist(prng) * (i + 1));
+        auto j = static_cast<size_t>(dist(prng) * (i + 1));
         std::swap(v[i], v[j]);
     }
 
@@ -234,7 +234,7 @@ template<typename T> std::vector<std::pair<T, float>> similar(const Map<T>& map,
     for (size_t j = 0; j < factors.rows_; j++) {
         auto row = factors.row(j);
         float score = dot(row, query) / (norms.at(j) * query_norm);
-        predictions.emplace_back(std::make_pair(j, score));
+        predictions.emplace_back(j, score);
     }
     std::ranges::sort(predictions, [](const std::pair<size_t, float>& a, const std::pair<size_t, float>& b) {
         return a.second > b.second;
@@ -246,7 +246,7 @@ template<typename T> std::vector<std::pair<T, float>> similar(const Map<T>& map,
     std::vector<std::pair<T, float>> recs;
     recs.reserve(predictions.size());
     for (auto& prediction : predictions) {
-        recs.emplace_back(std::make_pair(map.lookup(prediction.first), prediction.second));
+        recs.emplace_back(map.lookup(prediction.first), prediction.second);
     }
     return recs;
 }
@@ -257,11 +257,11 @@ template<typename T> std::vector<std::pair<T, float>> similar(const Map<T>& map,
 template<typename T, typename U> class Dataset {
   public:
     /// Creates a new dataset.
-    Dataset() {}
+    Dataset() = default;
 
     /// Adds a rating to the dataset.
     void push(T user_id, U item_id, float value) {
-        data_.emplace_back(detail::Rating<T, U>{user_id, item_id, value});
+        data_.emplace_back(user_id, item_id, value);
     }
 
     /// Returns the number of ratings in the dataset.
@@ -345,7 +345,7 @@ template<typename T, typename U> class Recommender {
         predictions.reserve(item_factors_.rows_);
         for (size_t j = 0; j < item_factors_.rows_; j++) {
             float score = detail::dot(item_factors_.row(j), query);
-            predictions.emplace_back(std::make_pair(j, score));
+            predictions.emplace_back(j, score);
         }
         std::ranges::sort(predictions, [](const std::pair<size_t, float>& a, const std::pair<size_t, float>& b) {
             return a.second > b.second;
@@ -357,7 +357,7 @@ template<typename T, typename U> class Recommender {
         std::vector<std::pair<U, float>> recs;
         recs.reserve(predictions.size());
         for (auto& prediction : predictions) {
-            recs.emplace_back(std::make_pair(item_map_.lookup(prediction.first), prediction.second));
+            recs.emplace_back(item_map_.lookup(prediction.first), prediction.second);
         }
         return recs;
     }
@@ -463,16 +463,16 @@ template<typename T, typename U> class Recommender {
 
             if (implicit) {
                 if (u == cui.size()) {
-                    cui.emplace_back(std::vector<std::pair<size_t, float>>());
+                    cui.emplace_back();
                 }
 
                 if (i == ciu.size()) {
-                    ciu.emplace_back(std::vector<std::pair<size_t, float>>());
+                    ciu.emplace_back();
                 }
 
                 float confidence = 1.0f + options.alpha * rating.value;
-                cui[u].emplace_back(std::make_pair(i, confidence));
-                ciu[i].emplace_back(std::make_pair(u, confidence));
+                cui[u].emplace_back(i, confidence);
+                ciu[i].emplace_back(u, confidence);
             } else {
                 row_inds.push_back(u);
                 col_inds.push_back(i);
