@@ -452,9 +452,11 @@ template<typename T, typename U> class Recommender {
         std::vector<size_t> col_inds;
         std::vector<float> values;
 
-        row_inds.reserve(train_set.size());
-        col_inds.reserve(train_set.size());
-        values.reserve(train_set.size());
+        if (!implicit) {
+            row_inds.reserve(train_set.size());
+            col_inds.reserve(train_set.size());
+            values.reserve(train_set.size());
+        }
 
         std::vector<std::vector<std::pair<size_t, float>>> cui;
         std::vector<std::vector<std::pair<size_t, float>>> ciu;
