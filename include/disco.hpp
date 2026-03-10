@@ -599,7 +599,7 @@ template<typename T, typename U> class Recommender {
                 float train_loss = 0.0f;
 
                 // shuffle for each iteration
-                for (const auto& j : detail::sample(prng, train_set.size())) {
+                for (auto j : detail::sample(prng, train_set.size())) {
                     auto [u, v, r] = train_data.at(j);
 
                     std::span<float> pu = recommender.user_factors_.row_mut(u);
