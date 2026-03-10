@@ -131,14 +131,23 @@ class CooMatrix {
 
 /// A list of lists (LIL) matrix.
 class LilMatrix {
-  public:
+  private:
     std::vector<std::vector<std::pair<size_t, float>>> row_list;
 
+  public:
     void push(size_t row_index, size_t col_index, float value) {
         if (row_index == row_list.size()) {
             row_list.emplace_back();
         }
         row_list.at(row_index).emplace_back(col_index, value);
+    }
+
+    size_t size() const {
+        return row_list.size();
+    }
+
+    const std::vector<std::pair<size_t, float>>& at(size_t i) const {
+        return row_list.at(i);
     }
 };
 
@@ -191,8 +200,8 @@ inline void least_squares_cg(LilMatrix& cui, DenseMatrix& x, DenseMatrix& y, flo
         row[i] += regularization;
     }
 
-    for (size_t u = 0; u < cui.row_list.size(); u++) {
-        auto row_vec = cui.row_list[u];
+    for (size_t u = 0; u < cui.size(); u++) {
+        auto row_vec = cui.at(u);
 
         // start from previous iteration
         auto xi = x.row_mut(u);
