@@ -505,8 +505,8 @@ template<typename T, typename U> class Recommender {
 
             if (implicit) {
                 float confidence = 1.0f + options.alpha * rating.value;
-                cui.push(i, u, confidence);
-                ciu.push(u, i, confidence);
+                cui.push(u, i, confidence);
+                ciu.push(i, u, confidence);
             } else {
                 train_data.push(u, i, rating.value);
                 sum += rating.value;
