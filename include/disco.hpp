@@ -176,8 +176,8 @@ inline void scaled_add(std::span<float> x, float a, std::span<const float> v) {
 }
 
 inline void neg(std::span<float> x) {
-    for (size_t i = 0; i < x.size(); i++) {
-        x[i] = -x[i];
+    for (auto& v : x) {
+        v = -v;
     }
 }
 
@@ -257,7 +257,7 @@ inline std::vector<size_t> sample(std::mt19937_64& prng, size_t n) {
     // Fisher–Yates shuffle
     std::uniform_real_distribution<float> dist(0, 1);
     for (size_t i = n - 1; i >= 1; i--) {
-        size_t j = static_cast<size_t>(dist(prng) * static_cast<float>(i + 1));
+        auto j = static_cast<size_t>(dist(prng) * static_cast<float>(i + 1));
         std::swap(v.at(i), v.at(j));
     }
 
@@ -489,9 +489,8 @@ template<typename T, typename U> class Recommender {
         detail::DenseMatrix m{rows, cols};
         std::uniform_real_distribution<float> dist(0, end_range);
         for (size_t i = 0; i < m.rows; i++) {
-            std::span<float> row = m.row_mut(i);
-            for (size_t j = 0; j < row.size(); j++) {
-                row[j] = dist(prng);
+            for (auto& v : m.row_mut(i)) {
+                v = dist(prng);
             }
         }
         return m;
