@@ -185,16 +185,15 @@ inline void least_squares_cg(LilMatrix& cui, DenseMatrix& x, DenseMatrix& y, flo
     size_t factors = x.cols_;
     DenseMatrix yty = DenseMatrix(factors, factors);
     for (size_t i = 0; i < factors; i++) {
-        for (size_t j = 0; j < factors; j++) {
+        auto row = yty.row_mut(i);
+        for (size_t j = 0; j < row.size(); j++) {
             float sum = 0.0;
             for (size_t k = 0; k < y.rows_; k++) {
                 sum += y.data_[k * factors + i] * y.data_[k * factors + j];
             }
-            yty.data_[i * factors + j] = sum;
+            row[j] = sum;
         }
-    }
-    for (size_t i = 0; i < factors; i++) {
-        yty.data_[i * factors + i] += regularization;
+        row[i] += regularization;
     }
 
     for (size_t u = 0; u < cui.row_list.size(); u++) {
