@@ -17,6 +17,7 @@
 #include <random>
 #include <set>
 #include <span>
+#include <tuple>
 #include <unordered_map>
 #include <utility>
 #include <vector>
