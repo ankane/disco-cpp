@@ -62,7 +62,7 @@ void test_explicit() {
         return;
     }
 
-    auto recommender = Recommender<int, std::string>::fit_explicit(*data, { .factors = 20 });
+    auto recommender = Recommender<int, std::string>::fit_explicit(data.value(), { .factors = 20 });
     auto recs = recommender.item_recs("Star Wars (1977)");
     assert(recs.size() == 5);
 }
@@ -73,7 +73,7 @@ void test_implicit() {
         return;
     }
 
-    auto recommender = Recommender<int, std::string>::fit_implicit(*data, { .factors = 20 });
+    auto recommender = Recommender<int, std::string>::fit_implicit(data.value(), { .factors = 20 });
     auto recs = recommender.item_recs("Star Wars (1977)");
     assert(recs.size() == 5);
 }
