@@ -88,7 +88,7 @@ class DenseMatrix {
         std::vector<float> res;
         res.reserve(rows);
         for (size_t i = 0; i < rows; i++) {
-            auto r = row(i);
+            std::span<const float> r = row(i);
             float sum = 0.0;
             for (size_t j = 0; j < cols; j++) {
                 sum += r[j] * x[j];
@@ -188,11 +188,11 @@ inline void least_squares_cg(LilMatrix& cui, DenseMatrix& x, DenseMatrix& y, flo
     size_t factors = x.cols;
     DenseMatrix yty{factors, factors};
     for (size_t i = 0; i < factors; i++) {
-        auto row = yty.row_mut(i);
+        std::span<float> row = yty.row_mut(i);
         for (size_t j = 0; j < row.size(); j++) {
             float sum = 0.0f;
             for (size_t k = 0; k < y.rows; k++) {
-                auto r = y.row(k);
+                std::span<const float> r = y.row(k);
                 sum += r[i] * r[j];
             }
             row[j] = sum;
@@ -204,7 +204,7 @@ inline void least_squares_cg(LilMatrix& cui, DenseMatrix& x, DenseMatrix& y, flo
         auto row_vec = cui.at(u);
 
         // start from previous iteration
-        auto xi = x.row_mut(u);
+        std::span<float> xi = x.row_mut(u);
 
         // calculate residual r = (YtCuPu - (YtCuY.dot(Xu), without computing YtCuY
         auto r = yty.dot(xi);
@@ -257,7 +257,7 @@ inline std::vector<size_t> sample(std::mt19937_64& prng, size_t n) {
     // Fisher–Yates shuffle
     std::uniform_real_distribution<float> dist(0, 1);
     for (size_t i = n - 1; i >= 1; i--) {
-        auto j = static_cast<size_t>(dist(prng) * (i + 1));
+        size_t j = static_cast<size_t>(dist(prng) * (i + 1));
         std::swap(v[i], v[j]);
     }
 
@@ -271,13 +271,13 @@ template<typename T> std::vector<std::pair<T, float>> similar(const Map<T>& map,
     }
 
     size_t i = *io;
-    auto query = factors.row(i);
+    std::span<const float> query = factors.row(i);
     auto query_norm = norms.at(i);
 
     std::vector<std::pair<size_t, float>> predictions;
     predictions.reserve(factors.rows);
     for (size_t j = 0; j < factors.rows; j++) {
-        auto row = factors.row(j);
+        std::span<const float> row = factors.row(j);
         float score = dot(row, query) / (norms.at(j) * query_norm);
         predictions.emplace_back(j, score);
     }
@@ -387,7 +387,7 @@ template<typename T, typename U> class Recommender {
         }
 
         size_t i = *io;
-        auto query = user_factors_.row(i);
+        std::span<const float> query = user_factors_.row(i);
 
         auto rated = rated_.at(i);
 
@@ -486,10 +486,10 @@ template<typename T, typename U> class Recommender {
         : user_map_{std::move(user_map)}, item_map_{std::move(item_map)}, rated_{std::move(rated)}, global_mean_{global_mean}, user_factors_{std::move(user_factors)}, item_factors_{std::move(item_factors)} {}
 
     static detail::DenseMatrix create_factors(size_t rows, size_t cols, std::mt19937_64& prng, float end_range) {
-        auto m = detail::DenseMatrix(rows, cols);
+        detail::DenseMatrix m{rows, cols};
         std::uniform_real_distribution<float> dist(0, end_range);
         for (size_t i = 0; i < m.rows; i++) {
-            auto row = m.row_mut(i);
+            std::span<float> row = m.row_mut(i);
             for (size_t j = 0; j < row.size(); j++) {
                 row[j] = dist(prng);
             }
@@ -602,8 +602,8 @@ template<typename T, typename U> class Recommender {
                 for (const auto& j : detail::sample(prng, train_set.size())) {
                     auto [u, v, r] = train_data.at(j);
 
-                    auto pu = recommender.user_factors_.row_mut(u);
-                    auto qv = recommender.item_factors_.row_mut(v);
+                    std::span<float> pu = recommender.user_factors_.row_mut(u);
+                    std::span<float> qv = recommender.item_factors_.row_mut(v);
                     float e = r - detail::dot(pu, qv);
 
                     // slow learner
