@@ -33,8 +33,8 @@ std::optional<Dataset<int, std::string>> load_movielens() {
     std::ifstream movies_file(std::string{path} + "/u.item");
     assert(movies_file.is_open());
     while (std::getline(movies_file, line)) {
-        std::string::size_type n = line.find('|');
-        std::string::size_type n2 = line.find('|', n + 1);
+        size_t n = line.find('|');
+        size_t n2 = line.find('|', n + 1);
         movies.emplace(line.substr(0, n), line.substr(n + 1, n2 - n - 1));
     }
 
@@ -43,9 +43,9 @@ std::optional<Dataset<int, std::string>> load_movielens() {
     std::ifstream ratings_file(std::string{path} + "/u.data");
     assert(ratings_file.is_open());
     while (std::getline(ratings_file, line)) {
-        std::string::size_type n = line.find('\t');
-        std::string::size_type n2 = line.find('\t', n + 1);
-        std::string::size_type n3 = line.find('\t', n2 + 1);
+        size_t n = line.find('\t');
+        size_t n2 = line.find('\t', n + 1);
+        size_t n3 = line.find('\t', n2 + 1);
         data.push(
             std::stoi(line.substr(0, n)),
             movies.at(line.substr(n + 1, n2 - n - 1)),

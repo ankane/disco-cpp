@@ -19,8 +19,8 @@ Dataset<int, std::string> load_movielens(const std::string& path) {
     std::ifstream movies_file(path + "/u.item");
     assert(movies_file.is_open());
     while (std::getline(movies_file, line)) {
-        std::string::size_type n = line.find('|');
-        std::string::size_type n2 = line.find('|', n + 1);
+        size_t n = line.find('|');
+        size_t n2 = line.find('|', n + 1);
         movies.emplace(line.substr(0, n), line.substr(n + 1, n2 - n - 1));
     }
 
@@ -29,9 +29,9 @@ Dataset<int, std::string> load_movielens(const std::string& path) {
     std::ifstream ratings_file(path + "/u.data");
     assert(ratings_file.is_open());
     while (std::getline(ratings_file, line)) {
-        std::string::size_type n = line.find('\t');
-        std::string::size_type n2 = line.find('\t', n + 1);
-        std::string::size_type n3 = line.find('\t', n2 + 1);
+        size_t n = line.find('\t');
+        size_t n2 = line.find('\t', n + 1);
+        size_t n3 = line.find('\t', n2 + 1);
         data.push(
             std::stoi(line.substr(0, n)),
             movies.at(line.substr(n + 1, n2 - n - 1)),
@@ -55,13 +55,13 @@ int main() {
 
     std::string movie = "Star Wars (1977)";
     std::cout << "Item-based recommendations for " << movie << std::endl;
-    for (auto& rec : recommender.item_recs(movie)) {
+    for (const auto& rec : recommender.item_recs(movie)) {
         std::cout << "- " << rec.first << std::endl;
     }
 
     int user_id = 123;
     std::cout << std::endl << "User-based recommendations for " << user_id << std::endl;
-    for (auto& rec : recommender.user_recs(user_id)) {
+    for (const auto& rec : recommender.user_recs(user_id)) {
         std::cout << "- " << rec.first << std::endl;
     }
 
