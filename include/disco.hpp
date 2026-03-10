@@ -272,7 +272,7 @@ template<typename T> std::vector<std::pair<T, float>> similar(const Map<T>& map,
 
     size_t i = *io;
     std::span<const float> query = factors.row(i);
-    auto query_norm = norms.at(i);
+    float query_norm = norms.at(i);
 
     std::vector<std::pair<size_t, float>> predictions;
     predictions.reserve(factors.rows);
@@ -389,7 +389,7 @@ template<typename T, typename U> class Recommender {
         size_t i = *io;
         std::span<const float> query = user_factors_.row(i);
 
-        auto rated = rated_.at(i);
+        const std::set<size_t>& rated = rated_.at(i);
 
         std::vector<std::pair<size_t, float>> predictions;
         predictions.reserve(item_factors_.rows);
