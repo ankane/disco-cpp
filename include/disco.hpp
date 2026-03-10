@@ -32,6 +32,10 @@ template<typename T, typename U> struct Rating {
 };
 
 template<typename T> class Map {
+  private:
+    std::unordered_map<T, size_t> map_;
+    std::vector<T> vec_;
+
   public:
     size_t add(const T& id) {
         auto [it, inserted] = map_.try_emplace(id, vec_.size());
@@ -60,9 +64,6 @@ template<typename T> class Map {
     std::span<const T> ids() const {
         return std::span{vec_};
     }
-
-    std::unordered_map<T, size_t> map_;
-    std::vector<T> vec_;
 };
 
 /// A dense matrix.
@@ -105,6 +106,7 @@ class DenseMatrix {
 
 /// A coordinate list (COO) matrix.
 class CooMatrix {
+  private:
     // separate vectors to avoid padding
     std::vector<size_t> row_indices;
     std::vector<size_t> col_indices;
