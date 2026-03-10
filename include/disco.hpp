@@ -206,7 +206,7 @@ inline void least_squares_cg(LilMatrix& cui, DenseMatrix& x, DenseMatrix& y, flo
         // calculate residual r = (YtCuPu - (YtCuY.dot(Xu), without computing YtCuY
         auto r = yty.dot(xi);
         neg(r);
-        for (const auto [i, confidence] : row_vec) {
+        for (auto [i, confidence] : row_vec) {
             scaled_add(
                 r,
                 confidence - (confidence - 1.0f) * dot(y.row(i), xi),
@@ -221,7 +221,7 @@ inline void least_squares_cg(LilMatrix& cui, DenseMatrix& x, DenseMatrix& y, flo
             // calculate Ap = YtCuYp - without actually calculating YtCuY
             std::span sp(p);
             auto ap = yty.dot(sp);
-            for (const auto [i, confidence] : row_vec) {
+            for (auto [i, confidence] : row_vec) {
                 scaled_add(ap, (confidence - 1.0f) * dot(y.row(i), p), y.row(i));
             }
 
