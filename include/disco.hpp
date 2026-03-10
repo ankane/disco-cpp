@@ -34,69 +34,69 @@ template<typename T, typename U> struct Rating {
 
 template<typename T> class Map {
   private:
-    std::unordered_map<T, size_t> map_;
-    std::vector<T> vec_;
+    std::unordered_map<T, size_t> map;
+    std::vector<T> vec;
 
   public:
     size_t add(const T& id) {
-        auto [it, inserted] = map_.try_emplace(id, vec_.size());
+        auto [it, inserted] = map.try_emplace(id, vec.size());
         if (inserted) {
-            vec_.push_back(id);
+            vec.push_back(id);
         }
         return it->second;
     }
 
     std::optional<size_t> get(const T& id) const {
-        auto search = map_.find(id);
-        if (search != map_.end()) {
+        auto search = map.find(id);
+        if (search != map.end()) {
             return search->second;
         }
         return std::nullopt;
     }
 
     const T& lookup(size_t index) const {
-        return vec_.at(index);
+        return vec.at(index);
     }
 
     size_t size() const {
-        return vec_.size();
+        return vec.size();
     }
 
     std::span<const T> ids() const {
-        return std::span{vec_};
+        return std::span{vec};
     }
 };
 
 /// A dense matrix.
 class DenseMatrix {
   private:
-    std::vector<float> data_;
+    std::vector<float> data;
 
   public:
-    size_t rows_;
-    size_t cols_;
+    size_t rows;
+    size_t cols;
 
-    DenseMatrix(size_t rows, size_t cols) : rows_{rows}, cols_{cols} {
-        data_ = std::vector<float>(rows * cols, 0);
+    DenseMatrix(size_t rows, size_t cols) : rows{rows}, cols{cols} {
+        data = std::vector<float>(rows * cols, 0);
     }
 
     std::span<const float> row(size_t i) const {
-        size_t idx = i * cols_;
-        return std::span{data_}.subspan(idx, cols_);
+        size_t idx = i * cols;
+        return std::span{data}.subspan(idx, cols);
     }
 
     std::span<float> row_mut(size_t i) {
-        size_t idx = i * cols_;
-        return std::span{data_}.subspan(idx, cols_);
+        size_t idx = i * cols;
+        return std::span{data}.subspan(idx, cols);
     }
 
     std::vector<float> dot(std::span<float> x) {
         std::vector<float> res;
-        res.reserve(rows_);
-        for (size_t i = 0; i < rows_; i++) {
+        res.reserve(rows);
+        for (size_t i = 0; i < rows; i++) {
             auto r = row(i);
             float sum = 0.0;
-            for (size_t j = 0; j < cols_; j++) {
+            for (size_t j = 0; j < cols; j++) {
                 sum += r[j] * x[j];
             }
             res.push_back(sum);
@@ -182,13 +182,13 @@ inline void least_squares_cg(LilMatrix& cui, DenseMatrix& x, DenseMatrix& y, flo
     size_t cg_steps = 3;
 
     // calculate YtY
-    size_t factors = x.cols_;
+    size_t factors = x.cols;
     DenseMatrix yty = DenseMatrix(factors, factors);
     for (size_t i = 0; i < factors; i++) {
         auto row = yty.row_mut(i);
         for (size_t j = 0; j < row.size(); j++) {
             float sum = 0.0f;
-            for (size_t k = 0; k < y.rows_; k++) {
+            for (size_t k = 0; k < y.rows; k++) {
                 auto r = y.row(k);
                 sum += r[i] * r[j];
             }
@@ -272,8 +272,8 @@ template<typename T> std::vector<std::pair<T, float>> similar(const Map<T>& map,
     auto query_norm = norms.at(i);
 
     std::vector<std::pair<size_t, float>> predictions;
-    predictions.reserve(factors.rows_);
-    for (size_t j = 0; j < factors.rows_; j++) {
+    predictions.reserve(factors.rows);
+    for (size_t j = 0; j < factors.rows; j++) {
         auto row = factors.row(j);
         float score = dot(row, query) / (norms.at(j) * query_norm);
         predictions.emplace_back(j, score);
@@ -308,16 +308,16 @@ template<typename T, typename U> class Dataset {
 
     /// Adds a rating to the dataset.
     void push(T user_id, U item_id, float value) {
-        data_.emplace_back(user_id, item_id, value);
+        data.emplace_back(user_id, item_id, value);
     }
 
     /// Returns the number of ratings in the dataset.
     size_t size() const {
-        return data_.size();
+        return data.size();
     }
 
     /// @private
-    std::vector<detail::Rating<T, U>> data_;
+    std::vector<detail::Rating<T, U>> data;
 };
 
 /// Information about a training iteration.
@@ -389,8 +389,8 @@ template<typename T, typename U> class Recommender {
         auto rated = rated_.at(i);
 
         std::vector<std::pair<size_t, float>> predictions;
-        predictions.reserve(item_factors_.rows_);
-        for (size_t j = 0; j < item_factors_.rows_; j++) {
+        predictions.reserve(item_factors_.rows);
+        for (size_t j = 0; j < item_factors_.rows; j++) {
             float score = detail::dot(item_factors_.row(j), query);
             predictions.emplace_back(j, score);
         }
@@ -485,7 +485,7 @@ template<typename T, typename U> class Recommender {
     static detail::DenseMatrix create_factors(size_t rows, size_t cols, std::mt19937_64& prng, float end_range) {
         auto m = detail::DenseMatrix(rows, cols);
         std::uniform_real_distribution<float> dist(0, end_range);
-        for (size_t i = 0; i < m.rows_; i++) {
+        for (size_t i = 0; i < m.rows; i++) {
             auto row = m.row_mut(i);
             for (size_t j = 0; j < row.size(); j++) {
                 row[j] = dist(prng);
@@ -506,7 +506,7 @@ template<typename T, typename U> class Recommender {
         detail::LilMatrix cui;
         detail::LilMatrix ciu;
 
-        for (const auto& rating : train_set.data_) {
+        for (const auto& rating : train_set.data) {
             size_t u = user_map.add(rating.user_id);
             size_t i = item_map.add(rating.item_id);
 
