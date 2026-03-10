@@ -270,7 +270,7 @@ template<typename T> std::vector<std::pair<T, float>> similar(const Map<T>& map,
         return std::vector<std::pair<T, float>>();
     }
 
-    size_t i = *io;
+    size_t i = io.value();
     std::span<const float> query = factors.row(i);
     float query_norm = norms.at(i);
 
@@ -376,7 +376,7 @@ template<typename T, typename U> class Recommender {
             return global_mean_;
         }
 
-        return detail::dot(user_factors_.row(*i), item_factors_.row(*j));
+        return detail::dot(user_factors_.row(i.value()), item_factors_.row(j.value()));
     }
 
     /// Returns recommendations for a user.
@@ -386,7 +386,7 @@ template<typename T, typename U> class Recommender {
             return std::vector<std::pair<U, float>>();
         }
 
-        size_t i = *io;
+        size_t i = io.value();
         std::span<const float> query = user_factors_.row(i);
 
         const std::set<size_t>& rated = rated_.at(i);
@@ -453,7 +453,7 @@ template<typename T, typename U> class Recommender {
     std::optional<std::span<const float>> user_factors(const T& user_id) const {
         std::optional<size_t> i = user_map_.get(user_id);
         if (i) {
-            return user_factors_.row(*i);
+            return user_factors_.row(i.value());
         }
         return std::nullopt;
     }
@@ -462,7 +462,7 @@ template<typename T, typename U> class Recommender {
     std::optional<std::span<const float>> item_factors(const U& item_id) const {
         std::optional<size_t> i = item_map_.get(item_id);
         if (i) {
-            return item_factors_.row(*i);
+            return item_factors_.row(i.value());
         }
         return std::nullopt;
     }
@@ -537,7 +537,7 @@ template<typename T, typename U> class Recommender {
         size_t factors = options.factors;
         std::mt19937_64 prng;
         if (options.seed) {
-            prng.seed(*options.seed);
+            prng.seed(options.seed.value());
         }
         float end_range = implicit ? 0.01f : 0.1f;
 
