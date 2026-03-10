@@ -366,17 +366,17 @@ template<typename T, typename U> class Recommender {
 
     /// Returns the predicted rating for a specific user and item.
     float predict(const T& user_id, const U& item_id) const {
-        auto i = user_map_.get(user_id);
+        std::optional<size_t> i = user_map_.get(user_id);
         if (!i) {
             return global_mean_;
         }
 
-        auto j = item_map_.get(item_id);
+        std::optional<size_t> j = item_map_.get(item_id);
         if (!j) {
             return global_mean_;
         }
 
-        return dot(user_factors_.row(*i), item_factors_.row(*j));
+        return detail::dot(user_factors_.row(*i), item_factors_.row(*j));
     }
 
     /// Returns recommendations for a user.
