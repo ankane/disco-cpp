@@ -39,7 +39,7 @@ std::optional<Dataset<int, std::string>> load_movielens() {
     }
 
     // read ratings and create dataset
-    auto data = Dataset<int, std::string>();
+    Dataset<int, std::string> data;
     std::ifstream ratings_file(std::string{path} + "/u.data");
     assert(ratings_file.is_open());
     while (std::getline(ratings_file, line)) {
@@ -79,7 +79,7 @@ void test_implicit() {
 }
 
 void test_rated() {
-    auto data = Dataset<int, std::string>();
+    Dataset<int, std::string> data;
     data.push(1, "A", 1.0);
     data.push(1, "B", 1.0);
     data.push(1, "C", 1.0);
@@ -107,7 +107,7 @@ void test_rated() {
 }
 
 void test_item_recs_same_score() {
-    auto data = Dataset<int, std::string>();
+    Dataset<int, std::string> data;
     data.push(1, "A", 1.0);
     data.push(1, "B", 1.0);
     data.push(2, "C", 1.0);
@@ -121,7 +121,7 @@ void test_item_recs_same_score() {
 }
 
 void test_ids() {
-    auto data = Dataset<int, std::string>();
+    Dataset<int, std::string> data;
     data.push(1, "A", 1.0);
     data.push(1, "B", 1.0);
     data.push(2, "B", 1.0);
@@ -132,7 +132,7 @@ void test_ids() {
 }
 
 void test_factors() {
-    auto data = Dataset<int, std::string>();
+    Dataset<int, std::string> data;
     data.push(1, "A", 1.0);
     data.push(1, "B", 1.0);
     data.push(2, "B", 1.0);
@@ -147,7 +147,7 @@ void test_factors() {
 }
 
 void test_callback_explicit() {
-    auto data = Dataset<int, std::string>();
+    Dataset<int, std::string> data;
     data.push(1, "A", 1.0);
 
     size_t calls = 0;
@@ -161,7 +161,7 @@ void test_callback_explicit() {
 }
 
 void test_callback_implicit() {
-    auto data = Dataset<int, std::string>();
+    Dataset<int, std::string> data;
     data.push(1, "A", 1.0);
 
     size_t calls = 0;

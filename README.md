@@ -38,7 +38,7 @@ Prep your data in the format `user_id, item_id, value`
 ```cpp
 using disco::Dataset;
 
-auto data = new Dataset<std::string, std::string>();
+Dataset<std::string, std::string> data;
 data.push("user_a", "item_a", 5.0);
 data.push("user_a", "item_b", 3.5);
 data.push("user_b", "item_a", 4.0);
