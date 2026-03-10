@@ -453,7 +453,7 @@ template<typename T, typename U> class Recommender {
         row_inds.reserve(capacity);
         col_inds.reserve(capacity);
         values.reserve(capacity);
-        float sum = 0.0;
+        float sum = 0.0f;
 
         std::vector<std::vector<std::pair<size_t, float>>> cui;
         std::vector<std::vector<std::pair<size_t, float>>> ciu;
