@@ -442,8 +442,6 @@ template<typename T, typename U> class Recommender {
     }
 
     static Recommender<T, U> fit(const Dataset<T, U>& train_set, const RecommenderOptions& options, bool implicit) {
-        size_t factors = options.factors;
-
         detail::Map<T> user_map;
         detail::Map<U> item_map;
         std::unordered_map<size_t, std::set<size_t>> rated;
@@ -491,17 +489,16 @@ template<typename T, typename U> class Recommender {
             }
         }
 
-        size_t users = user_map.size();
-        size_t items = item_map.size();
-
         float global_mean = implicit ? 0.0f : (std::reduce(values.begin(), values.end()) / values.size());
 
-        float end_range = implicit ? 0.01f : 0.1f;
-
+        size_t users = user_map.size();
+        size_t items = item_map.size();
+        size_t factors = options.factors;
         std::mt19937_64 prng;
         if (options.seed) {
             prng.seed(*options.seed);
         }
+        float end_range = implicit ? 0.01f : 0.1f;
 
         detail::DenseMatrix user_factors = create_factors(users, factors, prng, end_range);
         detail::DenseMatrix item_factors = create_factors(items, factors, prng, end_range);
