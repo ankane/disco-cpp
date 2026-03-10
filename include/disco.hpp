@@ -102,6 +102,33 @@ class DenseMatrix {
     }
 };
 
+class CooMatrix {
+  public:
+    std::vector<size_t> row_indices;
+    std::vector<size_t> col_indices;
+    std::vector<float> values;
+
+    void reserve(size_t capacity) {
+        row_indices.reserve(capacity);
+        col_indices.reserve(capacity);
+        values.reserve(capacity);
+    }
+
+    void push(size_t row_index, size_t col_index, float value) {
+        row_indices.push_back(row_index);
+        col_indices.push_back(col_index);
+        values.push_back(value);
+    }
+
+    size_t size() const {
+        return row_indices.size();
+    }
+
+    std::tuple<size_t, size_t, float> at(size_t i) {
+        return {row_indices.at(i), col_indices.at(i), values.at(i)};
+    }
+};
+
 inline float norm(std::span<const float> a) {
     float sum = 0.0;
     // TODO allow compiler to auto-vectorize
@@ -446,13 +473,8 @@ template<typename T, typename U> class Recommender {
         detail::Map<U> item_map;
         std::unordered_map<size_t, std::set<size_t>> rated;
 
-        std::vector<size_t> row_inds;
-        std::vector<size_t> col_inds;
-        std::vector<float> values;
-        size_t capacity = implicit ? 0 : train_set.size();
-        row_inds.reserve(capacity);
-        col_inds.reserve(capacity);
-        values.reserve(capacity);
+        detail::CooMatrix train_data;
+        train_data.reserve(implicit ? 0 : train_set.size());
         float sum = 0.0f;
 
         std::vector<std::vector<std::pair<size_t, float>>> cui;
@@ -475,9 +497,7 @@ template<typename T, typename U> class Recommender {
                 cui[u].emplace_back(i, confidence);
                 ciu[i].emplace_back(u, confidence);
             } else {
-                row_inds.push_back(u);
-                col_inds.push_back(i);
-                values.push_back(rating.value);
+                train_data.push(u, i, rating.value);
                 sum += rating.value;
             }
 
@@ -489,7 +509,7 @@ template<typename T, typename U> class Recommender {
             }
         }
 
-        float global_mean = implicit ? 0.0f : sum / values.size();
+        float global_mean = implicit ? 0.0f : sum / train_data.size();
 
         size_t users = user_map.size();
         size_t items = item_map.size();
@@ -558,13 +578,12 @@ template<typename T, typename U> class Recommender {
                 float train_loss = 0.0;
 
                 // shuffle for each iteration
-                for (auto& j : detail::sample(prng, train_set.size())) {
-                    size_t u = row_inds[j];
-                    size_t v = col_inds[j];
+                for (const auto& j : detail::sample(prng, train_set.size())) {
+                    auto [u, v, r] = train_data.at(j);
 
                     auto pu = recommender.user_factors_.row_mut(u);
                     auto qv = recommender.item_factors_.row_mut(v);
-                    float e = values[j] - detail::dot(pu, qv);
+                    float e = r - detail::dot(pu, qv);
 
                     // slow learner
                     float g_hat = 0.0;
