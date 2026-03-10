@@ -494,7 +494,9 @@ template<typename T, typename U> class Recommender {
         std::vector<std::set<size_t>> rated;
 
         detail::CooMatrix train_data;
-        train_data.reserve(implicit ? 0 : train_set.size());
+        if (!implicit) {
+            train_data.reserve(train_set.size());
+        }
         float sum = 0.0f;
 
         detail::LilMatrix cui;
