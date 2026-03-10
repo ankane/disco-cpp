@@ -31,14 +31,14 @@ void test_rated() {
     auto recommender = Recommender<int, std::string>::fit_implicit(data);
 
     std::vector<std::string> item_ids;
-    for (auto& v : recommender.user_recs(1, 5)) {
+    for (const auto& v : recommender.user_recs(1, 5)) {
         item_ids.push_back(v.first);
     }
     std::ranges::sort(item_ids);
     assert_eq(item_ids, {"E", "F"});
 
     item_ids.clear();
-    for (auto& v : recommender.user_recs(2, 5)) {
+    for (const auto& v : recommender.user_recs(2, 5)) {
         item_ids.push_back(v.first);
     }
     std::ranges::sort(item_ids);
@@ -53,7 +53,7 @@ void test_item_recs_same_score() {
 
     auto recommender = Recommender<int, std::string>::fit_implicit(data);
     std::vector<std::string> item_ids;
-    for (auto& v : recommender.item_recs("A", 5)) {
+    for (const auto& v : recommender.item_recs("A", 5)) {
         item_ids.push_back(v.first);
     }
     assert_eq(item_ids, {"B", "C"});
