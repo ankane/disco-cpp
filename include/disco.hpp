@@ -84,7 +84,7 @@ class DenseMatrix {
         return std::span{data}.subspan(idx, cols);
     }
 
-    std::vector<float> dot(std::span<float> x) {
+    std::vector<float> dot(std::span<const float> x) {
         std::vector<float> res;
         res.reserve(rows);
         for (size_t i = 0; i < rows; i++) {
