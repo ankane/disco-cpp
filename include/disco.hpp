@@ -69,10 +69,12 @@ template<typename T> class Map {
 
 /// A dense matrix.
 class DenseMatrix {
+  private:
+    std::vector<float> data_;
+
   public:
     size_t rows_;
     size_t cols_;
-    std::vector<float> data_;
 
     DenseMatrix(size_t rows, size_t cols) {
         rows_ = rows;
@@ -481,8 +483,11 @@ template<typename T, typename U> class Recommender {
     static detail::DenseMatrix create_factors(size_t rows, size_t cols, std::mt19937_64& prng, float end_range) {
         auto m = detail::DenseMatrix(rows, cols);
         std::uniform_real_distribution<float> dist(0, end_range);
-        for (size_t i = 0; i < m.data_.size(); i++) {
-            m.data_[i] = dist(prng);
+        for (size_t i = 0; i < m.rows_; i++) {
+            auto row = m.row_mut(i);
+            for (size_t j = 0; j < row.size(); j++) {
+                row[j] = dist(prng);
+            }
         }
         return m;
     }
