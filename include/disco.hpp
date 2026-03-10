@@ -129,6 +129,18 @@ class CooMatrix {
     }
 };
 
+class LilMatrix {
+  public:
+    std::vector<std::vector<std::pair<size_t, float>>> row_list;
+
+    void push(size_t row_index, size_t col_index, float value) {
+        if (row_index == row_list.size()) {
+            row_list.emplace_back();
+        }
+        row_list.at(row_index).emplace_back(col_index, value);
+    }
+};
+
 inline float norm(std::span<const float> a) {
     float sum = 0.0;
     // TODO allow compiler to auto-vectorize
@@ -159,7 +171,7 @@ inline void neg(std::span<float> x) {
     }
 }
 
-inline void least_squares_cg(std::vector<std::vector<std::pair<size_t, float>>>& cui, DenseMatrix& x, DenseMatrix& y, float regularization) {
+inline void least_squares_cg(LilMatrix& cui, DenseMatrix& x, DenseMatrix& y, float regularization) {
     size_t cg_steps = 3;
 
     // calculate YtY
@@ -178,8 +190,8 @@ inline void least_squares_cg(std::vector<std::vector<std::pair<size_t, float>>>&
         yty.data_[i * factors + i] += regularization;
     }
 
-    for (size_t u = 0; u < cui.size(); u++) {
-        auto row_vec = cui[u];
+    for (size_t u = 0; u < cui.row_list.size(); u++) {
+        auto row_vec = cui.row_list[u];
 
         // start from previous iteration
         auto xi = x.row_mut(u);
@@ -477,25 +489,17 @@ template<typename T, typename U> class Recommender {
         train_data.reserve(implicit ? 0 : train_set.size());
         float sum = 0.0f;
 
-        std::vector<std::vector<std::pair<size_t, float>>> cui;
-        std::vector<std::vector<std::pair<size_t, float>>> ciu;
+        detail::LilMatrix cui;
+        detail::LilMatrix ciu;
 
-        for (auto& rating : train_set.data_) {
+        for (const auto& rating : train_set.data_) {
             size_t u = user_map.add(rating.user_id);
             size_t i = item_map.add(rating.item_id);
 
             if (implicit) {
-                if (u == cui.size()) {
-                    cui.emplace_back();
-                }
-
-                if (i == ciu.size()) {
-                    ciu.emplace_back();
-                }
-
                 float confidence = 1.0f + options.alpha * rating.value;
-                cui[u].emplace_back(i, confidence);
-                ciu[i].emplace_back(u, confidence);
+                cui.push(i, u, confidence);
+                ciu.push(u, i, confidence);
             } else {
                 train_data.push(u, i, rating.value);
                 sum += rating.value;
