@@ -25,7 +25,7 @@ Dataset<int, std::string> load_movielens(const std::string& path) {
     }
 
     // read ratings and create dataset
-    auto data = Dataset<int, std::string>();
+    Dataset<int, std::string> data;
     std::ifstream ratings_file(path + "/u.data");
     assert(ratings_file.is_open());
     while (std::getline(ratings_file, line)) {
