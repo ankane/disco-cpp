@@ -76,9 +76,7 @@ class DenseMatrix {
     size_t rows_;
     size_t cols_;
 
-    DenseMatrix(size_t rows, size_t cols) {
-        rows_ = rows;
-        cols_ = cols;
+    DenseMatrix(size_t rows, size_t cols) : rows_{rows}, cols_{cols} {
         data_ = std::vector<float>(rows * cols, 0);
     }
 
