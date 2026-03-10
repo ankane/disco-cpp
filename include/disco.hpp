@@ -103,11 +103,11 @@ class DenseMatrix {
 };
 
 class CooMatrix {
-  public:
     std::vector<size_t> row_indices;
     std::vector<size_t> col_indices;
     std::vector<float> values;
 
+  public:
     void reserve(size_t capacity) {
         row_indices.reserve(capacity);
         col_indices.reserve(capacity);
