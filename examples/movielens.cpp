@@ -55,14 +55,14 @@ int main() {
 
     std::string movie = "Star Wars (1977)";
     std::cout << "Item-based recommendations for " << movie << std::endl;
-    for (const auto& rec : recommender.item_recs(movie)) {
-        std::cout << "- " << rec.first << std::endl;
+    for (const auto& [item_id, score] : recommender.item_recs(movie)) {
+        std::cout << "- " << item_id << std::endl;
     }
 
     int user_id = 123;
     std::cout << std::endl << "User-based recommendations for " << user_id << std::endl;
-    for (const auto& rec : recommender.user_recs(user_id)) {
-        std::cout << "- " << rec.first << std::endl;
+    for (const auto& [item_id, score] : recommender.user_recs(user_id)) {
+        std::cout << "- " << item_id << std::endl;
     }
 
     return 0;
