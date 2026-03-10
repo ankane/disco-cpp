@@ -262,6 +262,7 @@ To get started with development:
 ```sh
 git clone https://github.com/ankane/disco-cpp.git
 cd disco-cpp
-g++ -std=c++20 -Wall -Wextra -Werror -o test/main test/main.cpp
-test/main
+cmake -S . -B build
+cmake --build build
+build/test
 ```
