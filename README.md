@@ -116,12 +116,11 @@ using disco::Dataset;
 using disco::Recommender;
 
 Dataset<int, std::string> load_movielens(const std::string& path) {
-    std::string line;
-
     // read movies
     std::unordered_map<std::string, std::string> movies;
-    std::ifstream movies_file(path + "/u.item");
+    std::ifstream movies_file{path + "/u.item"};
     assert(movies_file.is_open());
+    std::string line;
     while (std::getline(movies_file, line)) {
         size_t n = line.find('|');
         size_t n2 = line.find('|', n + 1);
@@ -129,8 +128,8 @@ Dataset<int, std::string> load_movielens(const std::string& path) {
     }
 
     // read ratings and create dataset
-    auto data = Dataset<int, std::string>();
-    std::ifstream ratings_file(path + "/u.data");
+    Dataset<int, std::string> data;
+    std::ifstream ratings_file{path + "/u.data"};
     assert(ratings_file.is_open());
     while (std::getline(ratings_file, line)) {
         size_t n = line.find('\t');
@@ -154,10 +153,10 @@ int main() {
         return 1;
     }
 
-    auto data = load_movielens(movielens_path);
+    Dataset<int, std::string> data = load_movielens(movielens_path);
     auto recommender = Recommender<int, std::string>::fit_explicit(data, { .factors = 20 });
 
-    std::string movie = "Star Wars (1977)";
+    std::string movie{"Star Wars (1977)"};
     std::cout << "Item-based recommendations for " << movie << std::endl;
     for (const auto& [item_id, score] : recommender.item_recs(movie)) {
         std::cout << "- " << item_id << std::endl;

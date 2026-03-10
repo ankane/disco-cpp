@@ -26,12 +26,11 @@ std::optional<Dataset<int, std::string>> load_movielens() {
         return std::nullopt;
     }
 
-    std::string line;
-
     // read movies
     std::unordered_map<std::string, std::string> movies;
-    std::ifstream movies_file(std::string{path} + "/u.item");
+    std::ifstream movies_file{std::string{path} + "/u.item"};
     assert(movies_file.is_open());
+    std::string line;
     while (std::getline(movies_file, line)) {
         size_t n = line.find('|');
         size_t n2 = line.find('|', n + 1);
@@ -40,7 +39,7 @@ std::optional<Dataset<int, std::string>> load_movielens() {
 
     // read ratings and create dataset
     Dataset<int, std::string> data;
-    std::ifstream ratings_file(std::string{path} + "/u.data");
+    std::ifstream ratings_file{std::string{path} + "/u.data"};
     assert(ratings_file.is_open());
     while (std::getline(ratings_file, line)) {
         size_t n = line.find('\t');
