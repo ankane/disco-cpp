@@ -1,5 +1,7 @@
 #include <algorithm>
 #include <cassert>
+#include <fstream>
+#include <optional>
 #include <span>
 #include <string>
 #include <vector>
@@ -15,6 +17,65 @@ template<typename T> void assert_eq(const std::vector<T>& a, const std::vector<T
 
 template<typename T> void assert_eq(std::span<const T> a, const std::vector<T>& b) {
     assert(std::equal(a.begin(), a.end(), b.begin(), b.end()));
+}
+
+std::optional<Dataset<int, std::string>> load_movielens() {
+    // https://grouplens.org/datasets/movielens/100k/
+    const char* path = std::getenv("MOVIELENS_100K_PATH");
+    if (!path) {
+        return std::nullopt;
+    }
+
+    std::string line;
+
+    // read movies
+    std::unordered_map<std::string, std::string> movies;
+    std::ifstream movies_file(std::string{path} + "/u.item");
+    assert(movies_file.is_open());
+    while (std::getline(movies_file, line)) {
+        std::string::size_type n = line.find('|');
+        std::string::size_type n2 = line.find('|', n + 1);
+        movies.emplace(std::make_pair(line.substr(0, n), line.substr(n + 1, n2 - n - 1)));
+    }
+
+    // read ratings and create dataset
+    auto data = Dataset<int, std::string>();
+    std::ifstream ratings_file(std::string{path} + "/u.data");
+    assert(ratings_file.is_open());
+    while (std::getline(ratings_file, line)) {
+        std::string::size_type n = line.find('\t');
+        std::string::size_type n2 = line.find('\t', n + 1);
+        std::string::size_type n3 = line.find('\t', n2 + 1);
+        data.push(
+            std::stoi(line.substr(0, n)),
+            movies.at(line.substr(n + 1, n2 - n - 1)),
+            std::stof(line.substr(n2 + 1, n3 - n2 - 1))
+        );
+    }
+
+    return data;
+}
+
+void test_explicit() {
+    auto data = load_movielens();
+    if (!data) {
+        return;
+    }
+
+    auto recommender = Recommender<int, std::string>::fit_explicit(*data, { .factors = 20 });
+    auto recs = recommender.item_recs("Star Wars (1977)");
+    assert(recs.size() == 5);
+}
+
+void test_implicit() {
+    auto data = load_movielens();
+    if (!data) {
+        return;
+    }
+
+    auto recommender = Recommender<int, std::string>::fit_implicit(*data, { .factors = 20 });
+    auto recs = recommender.item_recs("Star Wars (1977)");
+    assert(recs.size() == 5);
 }
 
 void test_rated() {
@@ -114,6 +175,8 @@ void test_callback_implicit() {
 }
 
 int main() {
+    test_explicit();
+    test_implicit();
     test_rated();
     test_item_recs_same_score();
     test_ids();
