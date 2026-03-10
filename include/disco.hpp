@@ -449,12 +449,11 @@ template<typename T, typename U> class Recommender {
         std::vector<size_t> row_inds;
         std::vector<size_t> col_inds;
         std::vector<float> values;
-
-        if (!implicit) {
-            row_inds.reserve(train_set.size());
-            col_inds.reserve(train_set.size());
-            values.reserve(train_set.size());
-        }
+        size_t capacity = implicit ? 0 : train_set.size();
+        row_inds.reserve(capacity);
+        col_inds.reserve(capacity);
+        values.reserve(capacity);
+        float sum = 0.0;
 
         std::vector<std::vector<std::pair<size_t, float>>> cui;
         std::vector<std::vector<std::pair<size_t, float>>> ciu;
@@ -479,6 +478,7 @@ template<typename T, typename U> class Recommender {
                 row_inds.push_back(u);
                 col_inds.push_back(i);
                 values.push_back(rating.value);
+                sum += rating.value;
             }
 
             auto search = rated.find(u);
@@ -489,7 +489,7 @@ template<typename T, typename U> class Recommender {
             }
         }
 
-        float global_mean = implicit ? 0.0f : (std::reduce(values.begin(), values.end()) / values.size());
+        float global_mean = implicit ? 0.0f : sum / values.size();
 
         size_t users = user_map.size();
         size_t items = item_map.size();
