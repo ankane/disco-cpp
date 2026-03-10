@@ -26,12 +26,6 @@ namespace disco {
 
 namespace detail {
 
-template<typename T, typename U> struct Rating {
-    T user_id;
-    U item_id;
-    float value;
-};
-
 template<typename T> class Map {
   private:
     std::unordered_map<T, size_t> map;
@@ -317,7 +311,7 @@ template<typename T, typename U> class Dataset {
     }
 
     /// @private
-    std::vector<detail::Rating<T, U>> data;
+    std::vector<std::tuple<T, U, float>> data;
 };
 
 /// Information about a training iteration.
@@ -506,17 +500,17 @@ template<typename T, typename U> class Recommender {
         detail::LilMatrix cui;
         detail::LilMatrix ciu;
 
-        for (const auto& rating : train_set.data) {
-            size_t u = user_map.add(rating.user_id);
-            size_t i = item_map.add(rating.item_id);
+        for (const auto& [user_id, item_id, value] : train_set.data) {
+            size_t u = user_map.add(user_id);
+            size_t i = item_map.add(item_id);
 
             if (implicit) {
-                float confidence = 1.0f + options.alpha * rating.value;
+                float confidence = 1.0f + options.alpha * value;
                 cui.push(u, i, confidence);
                 ciu.push(i, u, confidence);
             } else {
-                train_data.push(u, i, rating.value);
-                sum += rating.value;
+                train_data.push(u, i, value);
+                sum += value;
             }
 
             if (u == rated.size()) {
