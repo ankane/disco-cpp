@@ -65,6 +65,7 @@ template<typename T> class Map {
     std::vector<T> vec_;
 };
 
+/// A dense matrix.
 class DenseMatrix {
   public:
     size_t rows_;
