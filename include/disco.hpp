@@ -468,8 +468,8 @@ template<typename T, typename U> class Recommender {
     std::vector<float> user_norms_;
     std::vector<float> item_norms_;
 
-    Recommender(detail::Map<T> user_map, detail::Map<U> item_map, std::vector<std::set<size_t>> rated, float global_mean, detail::DenseMatrix user_factors, detail::DenseMatrix item_factors)
-        : user_map_{user_map}, item_map_{item_map}, rated_{rated}, global_mean_{global_mean}, user_factors_{user_factors}, item_factors_{item_factors} {}
+    Recommender(detail::Map<T>&& user_map, detail::Map<U>&& item_map, std::vector<std::set<size_t>>&& rated, float global_mean, detail::DenseMatrix&& user_factors, detail::DenseMatrix&& item_factors)
+        : user_map_{std::move(user_map)}, item_map_{std::move(item_map)}, rated_{std::move(rated)}, global_mean_{global_mean}, user_factors_{std::move(user_factors)}, item_factors_{std::move(item_factors)} {}
 
     static detail::DenseMatrix create_factors(size_t rows, size_t cols, std::mt19937_64& prng, float end_range) {
         auto m = detail::DenseMatrix(rows, cols);
@@ -526,12 +526,12 @@ template<typename T, typename U> class Recommender {
         detail::DenseMatrix item_factors = create_factors(items, factors, prng, end_range);
 
         auto recommender = Recommender<T, U>(
-            user_map,
-            item_map,
-            rated,
+            std::move(user_map),
+            std::move(item_map),
+            std::move(rated),
             global_mean,
-            user_factors,
-            item_factors
+            std::move(user_factors),
+            std::move(item_factors)
         );
 
         if (implicit) {
