@@ -265,7 +265,7 @@ inline std::vector<size_t> sample(std::mt19937_64& prng, size_t n) {
 }
 
 template<typename T> std::vector<std::pair<T, float>> similar(const Map<T>& map, const DenseMatrix& factors, const std::vector<float>& norms, const T& id, size_t count) {
-    auto io = map.get(id);
+    std::optional<size_t> io = map.get(id);
     if (!io) {
         return std::vector<std::pair<T, float>>();
     }
@@ -381,7 +381,7 @@ template<typename T, typename U> class Recommender {
 
     /// Returns recommendations for a user.
     std::vector<std::pair<U, float>> user_recs(const T& user_id, size_t count = 5) const {
-        auto io = user_map_.get(user_id);
+        std::optional<size_t> io = user_map_.get(user_id);
         if (!io) {
             return std::vector<std::pair<U, float>>();
         }
@@ -451,7 +451,7 @@ template<typename T, typename U> class Recommender {
 
     /// Returns factors for a specific user.
     std::optional<std::span<const float>> user_factors(const T& user_id) const {
-        auto i = user_map_.get(user_id);
+        std::optional<size_t> i = user_map_.get(user_id);
         if (i) {
             return user_factors_.row(*i);
         }
@@ -460,7 +460,7 @@ template<typename T, typename U> class Recommender {
 
     /// Returns factors for a specific item.
     std::optional<std::span<const float>> item_factors(const U& item_id) const {
-        auto i = item_map_.get(item_id);
+        std::optional<size_t> i = item_map_.get(item_id);
         if (i) {
             return item_factors_.row(*i);
         }
