@@ -263,12 +263,6 @@ inline std::vector<size_t> sample(std::mt19937_64& prng, size_t n) {
     return v;
 }
 
-template<typename T> void truncate(std::vector<T>& vec, size_t count) {
-    if (vec.size() > count) {
-        vec.resize(count);
-    }
-}
-
 template<typename T> std::vector<std::pair<T, float>> similar(const Map<T>& map, const DenseMatrix& factors, const std::vector<float>& norms, const T& id, size_t count) {
     auto io = map.get(id);
     if (!io) {
@@ -289,14 +283,19 @@ template<typename T> std::vector<std::pair<T, float>> similar(const Map<T>& map,
     std::ranges::sort(predictions, [](const std::pair<size_t, float>& a, const std::pair<size_t, float>& b) {
         return a.second > b.second;
     });
-    detail::truncate(predictions, count + 1);
-    std::erase_if(predictions, [&i](const std::pair<size_t, float>& v) { return v.first == i; });
-    detail::truncate(predictions, count);
 
     std::vector<std::pair<T, float>> recs;
     recs.reserve(predictions.size());
-    for (const auto& prediction : predictions) {
-        recs.emplace_back(map.lookup(prediction.first), prediction.second);
+    for (auto [index, score] : predictions) {
+        if (index == i) {
+            continue;
+        }
+
+        recs.emplace_back(map.lookup(index), score);
+
+        if (recs.size() == count) {
+            break;
+        }
     }
     return recs;
 }
@@ -400,14 +399,19 @@ template<typename T, typename U> class Recommender {
         std::ranges::sort(predictions, [](const std::pair<size_t, float>& a, const std::pair<size_t, float>& b) {
             return a.second > b.second;
         });
-        detail::truncate(predictions, count + rated.size());
-        std::erase_if(predictions, [&](const std::pair<size_t, float>& v) { return rated.contains(v.first); });
-        detail::truncate(predictions, count);
 
         std::vector<std::pair<U, float>> recs;
         recs.reserve(predictions.size());
-        for (const auto& prediction : predictions) {
-            recs.emplace_back(item_map_.lookup(prediction.first), prediction.second);
+        for (auto [index, score] : predictions) {
+            if (rated.contains(index)) {
+                continue;
+            }
+
+            recs.emplace_back(item_map_.lookup(index), score);
+
+            if (recs.size() == count) {
+                break;
+            }
         }
         return recs;
     }
