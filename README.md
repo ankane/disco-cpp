@@ -125,7 +125,7 @@ Dataset<int, std::string> load_movielens(const std::string& path) {
     while (std::getline(movies_file, line)) {
         std::string::size_type n = line.find('|');
         std::string::size_type n2 = line.find('|', n + 1);
-        movies.emplace(std::make_pair(line.substr(0, n), line.substr(n + 1, n2 - n - 1)));
+        movies.emplace(line.substr(0, n), line.substr(n + 1, n2 - n - 1));
     }
 
     // read ratings and create dataset
