@@ -12,7 +12,6 @@
 #include <cstdint>
 #include <functional>
 #include <limits>
-#include <numeric>
 #include <optional>
 #include <random>
 #include <set>
