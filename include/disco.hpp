@@ -257,7 +257,7 @@ inline std::vector<size_t> sample(std::mt19937_64& prng, size_t n) {
     // Fisher–Yates shuffle
     std::uniform_real_distribution<float> dist(0, 1);
     for (size_t i = n - 1; i >= 1; i--) {
-        size_t j = static_cast<size_t>(dist(prng) * (i + 1));
+        size_t j = static_cast<size_t>(dist(prng) * static_cast<float>(i + 1));
         std::swap(v[i], v[j]);
     }
 
@@ -530,7 +530,7 @@ template<typename T, typename U> class Recommender {
             rated.at(u).insert(i);
         }
 
-        float global_mean = implicit ? 0.0f : sum / train_data.size();
+        float global_mean = implicit ? 0.0f : sum / static_cast<float>(train_data.size());
 
         size_t users = user_map.size();
         size_t items = item_map.size();
@@ -588,7 +588,7 @@ template<typename T, typename U> class Recommender {
             float learning_rate = options.learning_rate;
             float lambda = options.regularization.value_or(0.1f);
             size_t k = factors;
-            size_t ks = std::max(static_cast<size_t>(std::round(k * 0.08)), static_cast<size_t>(1));
+            size_t ks = std::max(static_cast<size_t>(std::round(static_cast<double>(k) * 0.08)), static_cast<size_t>(1));
 
             std::vector<float> g_slow(users, 1.0f);
             std::vector<float> g_fast(users, 1.0f);
@@ -624,8 +624,8 @@ template<typename T, typename U> class Recommender {
                         qv[d] -= nv * hvd;
                     }
 
-                    g_slow[u] += g_hat / ks;
-                    h_slow[v] += h_hat / ks;
+                    g_slow[u] += g_hat / static_cast<float>(ks);
+                    h_slow[v] += h_hat / static_cast<float>(ks);
 
                     // fast learner
                     // don't update on first outer iteration
@@ -647,15 +647,15 @@ template<typename T, typename U> class Recommender {
                             qv[d] -= nv * hvd;
                         }
 
-                        g_fast[u] += g_hat / (k - ks);
-                        h_fast[v] += h_hat / (k - ks);
+                        g_fast[u] += g_hat / static_cast<float>(k - ks);
+                        h_fast[v] += h_hat / static_cast<float>(k - ks);
                     }
 
                     train_loss += e * e;
                 }
 
                 if (options.callback) {
-                    train_loss = std::sqrt(train_loss / train_set.size());
+                    train_loss = std::sqrt(train_loss / static_cast<float>(train_set.size()));
 
                     FitInfo info;
                     info.iteration = iteration + 1;
