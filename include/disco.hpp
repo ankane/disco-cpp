@@ -286,7 +286,7 @@ template<typename T> std::vector<std::pair<T, float>> similar(const Map<T>& map,
     });
 
     std::vector<std::pair<T, float>> recs;
-    recs.reserve(predictions.size());
+    recs.reserve(std::min(count, predictions.size()));
     for (auto [index, score] : predictions) {
         if (index == i) {
             continue;
@@ -402,7 +402,7 @@ template<typename T, typename U> class Recommender {
         });
 
         std::vector<std::pair<U, float>> recs;
-        recs.reserve(predictions.size());
+        recs.reserve(std::min(count, predictions.size()));
         for (auto [index, score] : predictions) {
             if (rated.contains(index)) {
                 continue;
