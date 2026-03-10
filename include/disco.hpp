@@ -187,9 +187,10 @@ inline void least_squares_cg(LilMatrix& cui, DenseMatrix& x, DenseMatrix& y, flo
     for (size_t i = 0; i < factors; i++) {
         auto row = yty.row_mut(i);
         for (size_t j = 0; j < row.size(); j++) {
-            float sum = 0.0;
+            float sum = 0.0f;
             for (size_t k = 0; k < y.rows_; k++) {
-                sum += y.data_[k * factors + i] * y.data_[k * factors + j];
+                auto r = y.row(k);
+                sum += r[i] * r[j];
             }
             row[j] = sum;
         }
