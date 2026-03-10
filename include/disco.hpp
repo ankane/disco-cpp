@@ -590,10 +590,10 @@ template<typename T, typename U> class Recommender {
             size_t k = factors;
             size_t ks = std::max(static_cast<size_t>(std::round(k * 0.08)), static_cast<size_t>(1));
 
-            std::vector<float> g_slow(users, 1.0);
-            std::vector<float> g_fast(users, 1.0);
-            std::vector<float> h_slow(items, 1.0);
-            std::vector<float> h_fast(items, 1.0);
+            std::vector<float> g_slow(users, 1.0f);
+            std::vector<float> g_fast(users, 1.0f);
+            std::vector<float> h_slow(items, 1.0f);
+            std::vector<float> h_fast(items, 1.0f);
 
             for (size_t iteration = 0; iteration < options.iterations; iteration++) {
                 float train_loss = 0.0f;
