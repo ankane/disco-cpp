@@ -557,7 +557,7 @@ template<typename T, typename U> class Recommender {
             // conjugate gradient method
             // https://www.benfrederickson.com/fast-implicit-matrix-factorization/
 
-            float regularization = options.regularization.value_or(0.01);
+            float regularization = options.regularization.value_or(0.01f);
 
             for (size_t iteration = 0; iteration < options.iterations; iteration++) {
                 least_squares_cg(
@@ -586,7 +586,7 @@ template<typename T, typename U> class Recommender {
             // algorithm 2
 
             float learning_rate = options.learning_rate;
-            float lambda = options.regularization.value_or(0.1);
+            float lambda = options.regularization.value_or(0.1f);
             size_t k = factors;
             size_t ks = std::max(static_cast<size_t>(std::round(k * 0.08)), static_cast<size_t>(1));
 
@@ -596,7 +596,7 @@ template<typename T, typename U> class Recommender {
             std::vector<float> h_fast(items, 1.0);
 
             for (size_t iteration = 0; iteration < options.iterations; iteration++) {
-                float train_loss = 0.0;
+                float train_loss = 0.0f;
 
                 // shuffle for each iteration
                 for (const auto& j : detail::sample(prng, train_set.size())) {
@@ -607,8 +607,8 @@ template<typename T, typename U> class Recommender {
                     float e = r - detail::dot(pu, qv);
 
                     // slow learner
-                    float g_hat = 0.0;
-                    float h_hat = 0.0;
+                    float g_hat = 0.0f;
+                    float h_hat = 0.0f;
 
                     float nu = learning_rate * (1.0f / std::sqrt(g_slow[u]));
                     float nv = learning_rate * (1.0f / std::sqrt(h_slow[v]));
@@ -630,8 +630,8 @@ template<typename T, typename U> class Recommender {
                     // fast learner
                     // don't update on first outer iteration
                     if (iteration > 0) {
-                        float g_hat = 0.0;
-                        float h_hat = 0.0;
+                        float g_hat = 0.0f;
+                        float h_hat = 0.0f;
 
                         float nu = learning_rate * (1.0f / std::sqrt(g_fast[u]));
                         float nv = learning_rate * (1.0f / std::sqrt(h_fast[v]));
