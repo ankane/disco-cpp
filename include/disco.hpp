@@ -183,7 +183,7 @@ inline void least_squares_cg(LilMatrix& cui, DenseMatrix& x, DenseMatrix& y, flo
 
     // calculate YtY
     size_t factors = x.cols;
-    DenseMatrix yty = DenseMatrix(factors, factors);
+    DenseMatrix yty{factors, factors};
     for (size_t i = 0; i < factors; i++) {
         auto row = yty.row_mut(i);
         for (size_t j = 0; j < row.size(); j++) {
