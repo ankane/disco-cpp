@@ -380,7 +380,7 @@ template<typename T, typename U> class Recommender {
         size_t i = *io;
         auto query = user_factors_.row(i);
 
-        auto rated = rated_.find(i)->second;
+        auto rated = rated_.at(i);
 
         std::vector<std::pair<size_t, float>> predictions;
         predictions.reserve(item_factors_.rows_);
@@ -461,14 +461,14 @@ template<typename T, typename U> class Recommender {
   private:
     detail::Map<T> user_map_;
     detail::Map<U> item_map_;
-    std::unordered_map<size_t, std::set<size_t>> rated_;
+    std::vector<std::set<size_t>> rated_;
     float global_mean_;
     detail::DenseMatrix user_factors_;
     detail::DenseMatrix item_factors_;
     std::vector<float> user_norms_;
     std::vector<float> item_norms_;
 
-    Recommender(detail::Map<T> user_map, detail::Map<U> item_map, std::unordered_map<size_t, std::set<size_t>> rated, float global_mean, detail::DenseMatrix user_factors, detail::DenseMatrix item_factors)
+    Recommender(detail::Map<T> user_map, detail::Map<U> item_map, std::vector<std::set<size_t>> rated, float global_mean, detail::DenseMatrix user_factors, detail::DenseMatrix item_factors)
         : user_map_{user_map}, item_map_{item_map}, rated_{rated}, global_mean_{global_mean}, user_factors_{user_factors}, item_factors_{item_factors} {}
 
     static detail::DenseMatrix create_factors(size_t rows, size_t cols, std::mt19937_64& prng, float end_range) {
@@ -483,7 +483,7 @@ template<typename T, typename U> class Recommender {
     static Recommender<T, U> fit(const Dataset<T, U>& train_set, const RecommenderOptions& options, bool implicit) {
         detail::Map<T> user_map;
         detail::Map<U> item_map;
-        std::unordered_map<size_t, std::set<size_t>> rated;
+        std::vector<std::set<size_t>> rated;
 
         detail::CooMatrix train_data;
         train_data.reserve(implicit ? 0 : train_set.size());
@@ -505,12 +505,10 @@ template<typename T, typename U> class Recommender {
                 sum += rating.value;
             }
 
-            auto search = rated.find(u);
-            if (search == rated.end()) {
-                rated.insert(std::make_pair(u, std::set<size_t>{i}));
-            } else {
-                search->second.insert(i);
+            if (u == rated.size()) {
+                rated.emplace_back();
             }
+            rated.at(u).insert(i);
         }
 
         float global_mean = implicit ? 0.0f : sum / train_data.size();
