@@ -240,7 +240,7 @@ inline void least_squares_cg(LilMatrix& cui, DenseMatrix& x, DenseMatrix& y, flo
 
             float rs = rsnew / rsold;
             for (size_t i = 0; i < p.size(); i++) {
-                p[i] = r[i] + rs * p[i];
+                p.at(i) = r.at(i) + rs * p.at(i);
             }
             rsold = rsnew;
         }
@@ -258,7 +258,7 @@ inline std::vector<size_t> sample(std::mt19937_64& prng, size_t n) {
     std::uniform_real_distribution<float> dist(0, 1);
     for (size_t i = n - 1; i >= 1; i--) {
         size_t j = static_cast<size_t>(dist(prng) * static_cast<float>(i + 1));
-        std::swap(v[i], v[j]);
+        std::swap(v.at(i), v.at(j));
     }
 
     return v;
@@ -610,8 +610,8 @@ template<typename T, typename U> class Recommender {
                     float g_hat = 0.0f;
                     float h_hat = 0.0f;
 
-                    float nu = learning_rate * (1.0f / std::sqrt(g_slow[u]));
-                    float nv = learning_rate * (1.0f / std::sqrt(h_slow[v]));
+                    float nu = learning_rate * (1.0f / std::sqrt(g_slow.at(u)));
+                    float nv = learning_rate * (1.0f / std::sqrt(h_slow.at(v)));
 
                     for (size_t d = 0; d < ks; d++) {
                         float gud = -e * qv[d] + lambda * pu[d];
