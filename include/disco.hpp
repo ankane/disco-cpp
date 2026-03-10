@@ -102,7 +102,9 @@ class DenseMatrix {
     }
 };
 
+/// A coordinate list (COO) matrix.
 class CooMatrix {
+    // separate vectors to avoid padding
     std::vector<size_t> row_indices;
     std::vector<size_t> col_indices;
     std::vector<float> values;
@@ -129,6 +131,7 @@ class CooMatrix {
     }
 };
 
+/// A list of lists (LIL) matrix.
 class LilMatrix {
   public:
     std::vector<std::vector<std::pair<size_t, float>>> row_list;
