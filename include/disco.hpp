@@ -144,7 +144,7 @@ class LilMatrix {
 inline float norm(std::span<const float> a) {
     float sum = 0.0;
     // TODO allow compiler to auto-vectorize
-    for (auto& v : a) {
+    for (const auto& v : a) {
         sum += v * v;
     }
     return std::sqrt(sum);
@@ -286,7 +286,7 @@ template<typename T> std::vector<std::pair<T, float>> similar(const Map<T>& map,
 
     std::vector<std::pair<T, float>> recs;
     recs.reserve(predictions.size());
-    for (auto& prediction : predictions) {
+    for (const auto& prediction : predictions) {
         recs.emplace_back(map.lookup(prediction.first), prediction.second);
     }
     return recs;
@@ -397,7 +397,7 @@ template<typename T, typename U> class Recommender {
 
         std::vector<std::pair<U, float>> recs;
         recs.reserve(predictions.size());
-        for (auto& prediction : predictions) {
+        for (const auto& prediction : predictions) {
             recs.emplace_back(item_map_.lookup(prediction.first), prediction.second);
         }
         return recs;
