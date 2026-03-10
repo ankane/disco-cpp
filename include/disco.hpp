@@ -65,13 +65,13 @@ template<typename T> class Map {
     std::vector<T> vec_;
 };
 
-class Matrix {
+class DenseMatrix {
   public:
     size_t rows_;
     size_t cols_;
     std::vector<float> data_;
 
-    Matrix(size_t rows, size_t cols) {
+    DenseMatrix(size_t rows, size_t cols) {
         rows_ = rows;
         cols_ = cols;
         data_ = std::vector<float>(rows * cols, 0);
@@ -132,12 +132,12 @@ inline void neg(std::span<float> x) {
     }
 }
 
-inline void least_squares_cg(std::vector<std::vector<std::pair<size_t, float>>>& cui, Matrix& x, Matrix& y, float regularization) {
+inline void least_squares_cg(std::vector<std::vector<std::pair<size_t, float>>>& cui, DenseMatrix& x, DenseMatrix& y, float regularization) {
     size_t cg_steps = 3;
 
     // calculate YtY
     size_t factors = x.cols_;
-    Matrix yty = Matrix(factors, factors);
+    DenseMatrix yty = DenseMatrix(factors, factors);
     for (size_t i = 0; i < factors; i++) {
         for (size_t j = 0; j < factors; j++) {
             float sum = 0.0;
@@ -221,7 +221,7 @@ template<typename T> void truncate(std::vector<T>& vec, size_t count) {
     }
 }
 
-template<typename T> std::vector<std::pair<T, float>> similar(const Map<T>& map, const Matrix& factors, const std::vector<float>& norms, const T& id, size_t count) {
+template<typename T> std::vector<std::pair<T, float>> similar(const Map<T>& map, const DenseMatrix& factors, const std::vector<float>& norms, const T& id, size_t count) {
     auto io = map.get(id);
     if (!io) {
         return std::vector<std::pair<T, float>>();
@@ -424,16 +424,16 @@ template<typename T, typename U> class Recommender {
     detail::Map<U> item_map_;
     std::unordered_map<size_t, std::set<size_t>> rated_;
     float global_mean_;
-    detail::Matrix user_factors_;
-    detail::Matrix item_factors_;
+    detail::DenseMatrix user_factors_;
+    detail::DenseMatrix item_factors_;
     std::vector<float> user_norms_;
     std::vector<float> item_norms_;
 
-    Recommender(detail::Map<T> user_map, detail::Map<U> item_map, std::unordered_map<size_t, std::set<size_t>> rated, float global_mean, detail::Matrix user_factors, detail::Matrix item_factors)
+    Recommender(detail::Map<T> user_map, detail::Map<U> item_map, std::unordered_map<size_t, std::set<size_t>> rated, float global_mean, detail::DenseMatrix user_factors, detail::DenseMatrix item_factors)
         : user_map_{user_map}, item_map_{item_map}, rated_{rated}, global_mean_{global_mean}, user_factors_{user_factors}, item_factors_{item_factors} {}
 
-    static detail::Matrix create_factors(size_t rows, size_t cols, std::mt19937_64& prng, float end_range) {
-        auto m = detail::Matrix(rows, cols);
+    static detail::DenseMatrix create_factors(size_t rows, size_t cols, std::mt19937_64& prng, float end_range) {
+        auto m = detail::DenseMatrix(rows, cols);
         std::uniform_real_distribution<float> dist(0, end_range);
         for (size_t i = 0; i < m.data_.size(); i++) {
             m.data_[i] = dist(prng);
@@ -503,8 +503,8 @@ template<typename T, typename U> class Recommender {
             prng.seed(*options.seed);
         }
 
-        detail::Matrix user_factors = create_factors(users, factors, prng, end_range);
-        detail::Matrix item_factors = create_factors(items, factors, prng, end_range);
+        detail::DenseMatrix user_factors = create_factors(users, factors, prng, end_range);
+        detail::DenseMatrix item_factors = create_factors(items, factors, prng, end_range);
 
         auto recommender = Recommender<T, U>(
             user_map,
