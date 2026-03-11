@@ -145,9 +145,13 @@ class LilMatrix {
         return row_list.size();
     }
 
-    const std::vector<std::pair<size_t, float>>& at(size_t i) const {
-        return row_list.at(i);
-    }
+    std::vector<std::vector<std::pair<size_t, float>>>::iterator begin() {
+        return row_list.begin();
+    };
+
+    std::vector<std::vector<std::pair<size_t, float>>>::iterator end() {
+        return row_list.end();
+    };
 };
 
 inline float norm(std::span<const float> a) {
@@ -199,9 +203,8 @@ inline void least_squares_cg(LilMatrix& cui, DenseMatrix& x, DenseMatrix& y, flo
         row[i] += regularization;
     }
 
-    for (size_t u = 0; u < cui.size(); u++) {
-        const std::vector<std::pair<size_t, float>>& row_vec = cui.at(u);
-
+    size_t u = 0;
+    for (auto& row_vec : cui) {
         // start from previous iteration
         std::span<float> xi = x.row_mut(u);
 
@@ -243,6 +246,7 @@ inline void least_squares_cg(LilMatrix& cui, DenseMatrix& x, DenseMatrix& y, flo
             }
             rsold = rsnew;
         }
+        u++;
     }
 }
 
