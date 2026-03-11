@@ -576,9 +576,10 @@ template<typename T, typename U> class Recommender {
                 );
 
                 if (options.callback) {
-                    FitInfo info;
-                    info.iteration = iteration + 1;
-                    info.train_loss = std::numeric_limits<float>::quiet_NaN();
+                    FitInfo info{
+                        .iteration = iteration + 1,
+                        .train_loss = std::numeric_limits<float>::quiet_NaN()
+                    };
                     options.callback(info);
                 }
             }
@@ -659,9 +660,10 @@ template<typename T, typename U> class Recommender {
                 if (options.callback) {
                     train_loss = std::sqrt(train_loss / static_cast<float>(train_set.size()));
 
-                    FitInfo info;
-                    info.iteration = iteration + 1;
-                    info.train_loss = train_loss;
+                    FitInfo info{
+                        .iteration = iteration + 1,
+                        .train_loss = train_loss
+                    };
                     options.callback(info);
                 }
             }
