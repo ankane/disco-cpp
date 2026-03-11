@@ -224,8 +224,7 @@ inline void least_squares_cg(LilMatrix& cui, DenseMatrix& x, DenseMatrix& y, flo
 
         for (size_t step = 0; step < cg_steps; step++) {
             // calculate Ap = YtCuYp - without actually calculating YtCuY
-            std::span sp(p);
-            std::vector<float> ap = yty.dot(sp);
+            std::vector<float> ap = yty.dot(p);
             for (auto [i, confidence] : row_vec) {
                 scaled_add(ap, (confidence - 1.0f) * dot(y.row(i), p), y.row(i));
             }
