@@ -4,7 +4,6 @@
 #include <iostream>
 #include <string>
 #include <unordered_map>
-#include <utility>
 
 #include "../include/disco.hpp"
 
@@ -44,7 +43,7 @@ Dataset<int, std::string> load_movielens(const std::string& path) {
 int main() {
     // https://grouplens.org/datasets/movielens/100k/
     const char* movielens_path = std::getenv("MOVIELENS_100K_PATH");
-    if (!movielens_path) {
+    if (movielens_path == nullptr) {
         std::cout << "Set MOVIELENS_100K_PATH" << std::endl;
         return 1;
     }
