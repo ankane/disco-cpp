@@ -26,7 +26,7 @@ template<typename T> void assert_eq(std::span<const T> a, const std::vector<T>& 
 std::optional<Dataset<int, std::string>> load_movielens() {
     // https://grouplens.org/datasets/movielens/100k/
     const char* path = std::getenv("MOVIELENS_100K_PATH");
-    if (!path) {
+    if (path == nullptr) {
         return std::nullopt;
     }
 
