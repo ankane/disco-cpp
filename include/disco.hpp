@@ -147,11 +147,11 @@ class LilMatrix {
 
     std::vector<std::vector<std::pair<size_t, float>>>::iterator begin() {
         return row_list.begin();
-    };
+    }
 
     std::vector<std::vector<std::pair<size_t, float>>>::iterator end() {
         return row_list.end();
-    };
+    }
 };
 
 inline float norm(std::span<const float> a) {
