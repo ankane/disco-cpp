@@ -153,7 +153,7 @@ class LilMatrix {
 inline float norm(std::span<const float> a) {
     float sum = 0.0;
     // TODO allow compiler to auto-vectorize
-    for (const auto& v : a) {
+    for (auto v : a) {
         sum += v * v;
     }
     return std::sqrt(sum);
