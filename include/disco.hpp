@@ -627,8 +627,8 @@ template<typename T, typename U> class Recommender {
                         qv[d] -= nv * hvd;
                     }
 
-                    g_slow[u] += g_hat / static_cast<float>(ks);
-                    h_slow[v] += h_hat / static_cast<float>(ks);
+                    g_slow.at(u) += g_hat / static_cast<float>(ks);
+                    h_slow.at(v) += h_hat / static_cast<float>(ks);
 
                     // fast learner
                     // don't update on first outer iteration
@@ -650,8 +650,8 @@ template<typename T, typename U> class Recommender {
                             qv[d] -= nv * hvd;
                         }
 
-                        g_fast[u] += g_hat / static_cast<float>(k - ks);
-                        h_fast[v] += h_hat / static_cast<float>(k - ks);
+                        g_fast.at(u) += g_hat / static_cast<float>(k - ks);
+                        h_fast.at(v) += h_hat / static_cast<float>(k - ks);
                     }
 
                     train_loss += e * e;
