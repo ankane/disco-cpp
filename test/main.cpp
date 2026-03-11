@@ -142,8 +142,10 @@ void test_factors() {
 
     auto recommender = Recommender<int, std::string>::fit_implicit(data, { .factors = 20 });
 
-    assert((*recommender.user_factors(1)).size() == 20);
-    assert((*recommender.item_factors("A")).size() == 20);
+    auto user_factors = recommender.user_factors(1);
+    assert(user_factors.has_value() && user_factors.value().size() == 20);
+    auto item_factors = recommender.item_factors("A");
+    assert(item_factors.has_value() && item_factors.value().size() == 20);
 
     assert(recommender.user_factors(3) == std::nullopt);
     assert(recommender.item_factors("C") == std::nullopt);
