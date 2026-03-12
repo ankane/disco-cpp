@@ -679,12 +679,12 @@ template<typename T, typename U> class Recommender {
             }
         }
 
-        for (size_t i = 0; i < users; i++) {
-            recommender.user_norms_.push_back(detail::norm(recommender.user_factors_.row(i)));
+        for (const auto& row : recommender.user_factors_.rows()) {
+            recommender.user_norms_.push_back(detail::norm(row));
         }
 
-        for (size_t i = 0; i < items; i++) {
-            recommender.item_norms_.push_back(detail::norm(recommender.item_factors_.row(i)));
+        for (const auto& row : recommender.item_factors_.rows()) {
+            recommender.item_norms_.push_back(detail::norm(row));
         }
 
         return recommender;
