@@ -14,6 +14,7 @@
 #include <limits>
 #include <optional>
 #include <random>
+#include <ranges>
 #include <set>
 #include <span>
 #include <tuple>
@@ -66,10 +67,10 @@ class DenseMatrix {
     std::vector<float> data;
 
   public:
-    size_t rows;
+    size_t rows_;
     size_t cols;
 
-    DenseMatrix(size_t rows, size_t cols) : rows{rows}, cols{cols} {
+    DenseMatrix(size_t rows, size_t cols) : rows_{rows}, cols{cols} {
         data = std::vector<float>(rows * cols, 0);
     }
 
@@ -83,11 +84,22 @@ class DenseMatrix {
         return std::span{data}.subspan(idx, cols);
     }
 
+    auto rows() const {
+        return std::views::transform(std::views::iota(0u, rows_), [&](size_t i) {
+            return row(i);
+        });
+    }
+
+    auto rows_mut() {
+        return std::views::transform(std::views::iota(0u, rows_), [&](size_t i) {
+            return row_mut(i);
+        });
+    }
+
     std::vector<float> dot(std::span<const float> x) const {
         std::vector<float> res;
-        res.reserve(rows);
-        for (size_t i = 0; i < rows; i++) {
-            std::span<const float> r = row(i);
+        res.reserve(rows_);
+        for (const auto& r : rows()) {
             float sum = 0.0;
             for (size_t j = 0; j < cols; j++) {
                 sum += r[j] * x[j];
@@ -194,7 +206,7 @@ inline void least_squares_cg(LilMatrix& cui, DenseMatrix& x, DenseMatrix& y, flo
         std::span<float> row = yty.row_mut(i);
         for (size_t j = 0; j < row.size(); j++) {
             float sum = 0.0f;
-            for (size_t k = 0; k < y.rows; k++) {
+            for (size_t k = 0; k < y.rows_; k++) {
                 std::span<const float> r = y.row(k);
                 sum += r[i] * r[j];
             }
@@ -277,8 +289,8 @@ template<typename T> std::vector<std::pair<T, float>> similar(const Map<T>& map,
     float query_norm = norms.at(i);
 
     std::vector<std::pair<size_t, float>> predictions;
-    predictions.reserve(factors.rows);
-    for (size_t j = 0; j < factors.rows; j++) {
+    predictions.reserve(factors.rows_);
+    for (size_t j = 0; j < factors.rows_; j++) {
         std::span<const float> row = factors.row(j);
         float score = dot(row, query) / (norms.at(j) * query_norm);
         predictions.emplace_back(j, score);
@@ -394,8 +406,8 @@ template<typename T, typename U> class Recommender {
         const std::set<size_t>& rated = rated_.at(i);
 
         std::vector<std::pair<size_t, float>> predictions;
-        predictions.reserve(item_factors_.rows);
-        for (size_t j = 0; j < item_factors_.rows; j++) {
+        predictions.reserve(item_factors_.rows_);
+        for (size_t j = 0; j < item_factors_.rows_; j++) {
             float score = detail::dot(item_factors_.row(j), query);
             predictions.emplace_back(j, score);
         }
@@ -490,8 +502,8 @@ template<typename T, typename U> class Recommender {
     static detail::DenseMatrix create_factors(size_t rows, size_t cols, std::mt19937_64& prng, float end_range) {
         detail::DenseMatrix m{rows, cols};
         std::uniform_real_distribution<float> dist(0, end_range);
-        for (size_t i = 0; i < m.rows; i++) {
-            for (auto& v : m.row_mut(i)) {
+        for (auto&& row : m.rows_mut()) {
+            for (auto& v : row) {
                 v = dist(prng);
             }
         }
