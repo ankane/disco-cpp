@@ -10,7 +10,7 @@
 #include <unordered_map>
 #include <vector>
 
-#include "../include/disco.hpp"
+#include <disco.hpp>
 
 using disco::Dataset;
 using disco::Recommender;
