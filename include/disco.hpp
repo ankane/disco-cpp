@@ -206,8 +206,7 @@ inline void least_squares_cg(LilMatrix& cui, DenseMatrix& x, DenseMatrix& y, flo
         std::span<float> row = yty.row_mut(i);
         for (size_t j = 0; j < row.size(); j++) {
             float sum = 0.0f;
-            for (size_t k = 0; k < y.rows_; k++) {
-                std::span<const float> r = y.row(k);
+            for (const auto& r : y.rows()) {
                 sum += r[i] * r[j];
             }
             row[j] = sum;
