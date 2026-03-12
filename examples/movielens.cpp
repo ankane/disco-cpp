@@ -5,7 +5,7 @@
 #include <string>
 #include <unordered_map>
 
-#include "../include/disco.hpp"
+#include "disco.hpp"
 
 using disco::Dataset;
 using disco::Recommender;
