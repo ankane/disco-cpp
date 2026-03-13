@@ -655,8 +655,8 @@ template<typename T, typename U> class Recommender {
                         float g_hat = 0.0f;
                         float h_hat = 0.0f;
 
-                        float nu = learning_rate * (1.0f / std::sqrt(g_fast[u]));
-                        float nv = learning_rate * (1.0f / std::sqrt(h_fast[v]));
+                        float nu = learning_rate * (1.0f / std::sqrt(g_fast.at(u)));
+                        float nv = learning_rate * (1.0f / std::sqrt(h_fast.at(v)));
 
                         for (size_t d = ks; d < k; d++) {
                             float gud = -e * qv[d] + lambda * pu[d];
