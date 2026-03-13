@@ -256,11 +256,13 @@ inline std::vector<size_t> sample(std::mt19937_64& prng, size_t n) {
         v.push_back(i);
     }
 
-    // Fisher–Yates shuffle
-    std::uniform_real_distribution<float> dist(0, 1);
-    for (size_t i = n - 1; i >= 1; i--) {
-        auto j = static_cast<size_t>(dist(prng) * static_cast<float>(i + 1));
-        std::swap(v.at(i), v.at(j));
+    if (n > 0) {
+        // Fisher–Yates shuffle
+        std::uniform_real_distribution<float> dist(0, 1);
+        for (size_t i = n - 1; i >= 1; i--) {
+            auto j = static_cast<size_t>(dist(prng) * static_cast<float>(i + 1));
+            std::swap(v.at(i), v.at(j));
+        }
     }
 
     return v;

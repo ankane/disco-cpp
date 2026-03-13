@@ -179,6 +179,13 @@ void test_callback_implicit() {
     assert(calls == 20);
 }
 
+void test_no_training_data() {
+    Dataset<int, std::string> data;
+    auto recommender = Recommender<int, std::string>::fit_explicit(data);
+    assert(recommender.user_ids().empty());
+    assert(recommender.item_ids().empty());
+}
+
 int main() {
     test_explicit();
     test_implicit();
@@ -188,5 +195,6 @@ int main() {
     test_factors();
     test_callback_explicit();
     test_callback_implicit();
+    test_no_training_data();
     return 0;
 }
