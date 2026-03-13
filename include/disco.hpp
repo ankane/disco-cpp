@@ -74,7 +74,7 @@ class DenseMatrix {
     }
 
     std::span<const float> row(size_t i) const {
-        // subspan does not do bounds checking
+        // subspan does not perform bounds checking
         if (i >= rows) {
             throw std::out_of_range{"row out of range"};
         }
@@ -83,7 +83,7 @@ class DenseMatrix {
     }
 
     std::span<float> row_mut(size_t i) {
-        // subspan does not do bounds checking
+        // subspan does not perform bounds checking
         if (i >= rows) {
             throw std::out_of_range{"row out of range"};
         }
