@@ -74,11 +74,19 @@ class DenseMatrix {
     }
 
     std::span<const float> row(size_t i) const {
+        // subspan does not do bounds checking
+        if (i >= rows) {
+            throw std::out_of_range{"row out of range"};
+        }
         size_t idx = i * cols;
         return std::span{data}.subspan(idx, cols);
     }
 
     std::span<float> row_mut(size_t i) {
+        // subspan does not do bounds checking
+        if (i >= rows) {
+            throw std::out_of_range{"row out of range"};
+        }
         size_t idx = i * cols;
         return std::span{data}.subspan(idx, cols);
     }
