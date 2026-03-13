@@ -288,7 +288,8 @@ template<typename T> std::vector<std::pair<T, float>> similar(const Map<T>& map,
     if (count > predictions.size() - 1) {
         count = predictions.size() - 1;
     }
-    std::ranges::partial_sort(predictions, predictions.begin() + std::min(predictions.size(), count + 1), [](const std::pair<size_t, float>& a, const std::pair<size_t, float>& b) {
+    // TODO check cast
+    std::ranges::partial_sort(predictions, predictions.begin() + static_cast<ptrdiff_t>(std::min(predictions.size(), count + 1)), [](const std::pair<size_t, float>& a, const std::pair<size_t, float>& b) {
         return a.second > b.second;
     });
 
@@ -407,7 +408,8 @@ template<typename T, typename U> class Recommender {
         if (count > predictions.size() - rated.size()) {
             count = predictions.size() - rated.size();
         }
-        std::ranges::partial_sort(predictions, predictions.begin() + std::min(predictions.size(), count + rated.size()), [](const std::pair<size_t, float>& a, const std::pair<size_t, float>& b) {
+        // TODO check cast
+        std::ranges::partial_sort(predictions, predictions.begin() + static_cast<ptrdiff_t>(std::min(predictions.size(), count + rated.size())), [](const std::pair<size_t, float>& a, const std::pair<size_t, float>& b) {
             return a.second > b.second;
         });
 
