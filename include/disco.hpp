@@ -283,12 +283,15 @@ template<typename T> std::vector<std::pair<T, float>> similar(const Map<T>& map,
         float score = dot(row, query) / (norms.at(j) * query_norm);
         predictions.emplace_back(j, score);
     }
+    if (count > predictions.size() - 1) {
+        count = predictions.size() - 1;
+    }
     std::ranges::partial_sort(predictions, predictions.begin() + std::min(predictions.size(), count + 1), [](const std::pair<size_t, float>& a, const std::pair<size_t, float>& b) {
         return a.second > b.second;
     });
 
     std::vector<std::pair<T, float>> recs;
-    recs.reserve(std::min(count, predictions.size()));
+    recs.reserve(count);
     for (auto [index, score] : predictions) {
         if (index == i) {
             continue;
@@ -399,12 +402,15 @@ template<typename T, typename U> class Recommender {
             float score = detail::dot(item_factors_.row(j), query);
             predictions.emplace_back(j, score);
         }
+        if (count > predictions.size() - rated.size()) {
+            count = predictions.size() - rated.size();
+        }
         std::ranges::partial_sort(predictions, predictions.begin() + std::min(predictions.size(), count + rated.size()), [](const std::pair<size_t, float>& a, const std::pair<size_t, float>& b) {
             return a.second > b.second;
         });
 
         std::vector<std::pair<U, float>> recs;
-        recs.reserve(std::min(count, predictions.size()));
+        recs.reserve(count);
         for (auto [index, score] : predictions) {
             if (rated.contains(index)) {
                 continue;
