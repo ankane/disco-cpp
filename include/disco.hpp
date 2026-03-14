@@ -294,9 +294,7 @@ template<typename T> std::vector<std::pair<T, float>> similar(const Map<T>& map,
         float score = dot(row, query) / (norms.at(j) * query_norm);
         predictions.emplace_back(j, score);
     }
-    if (count > predictions.size() - 1) {
-        count = predictions.size() - 1;
-    }
+    count = std::min(count, predictions.size() - 1);
     // TODO check cast
     auto diff = static_cast<ptrdiff_t>(std::min(predictions.size(), count + 1));
     std::ranges::partial_sort(predictions, predictions.begin() + diff, [](const std::pair<size_t, float>& a, const std::pair<size_t, float>& b) {
@@ -415,9 +413,7 @@ template<typename T, typename U> class Recommender {
             float score = detail::dot(item_factors_.row(j), query);
             predictions.emplace_back(j, score);
         }
-        if (count > predictions.size() - rated.size()) {
-            count = predictions.size() - rated.size();
-        }
+        count = std::min(count, predictions.size() - rated.size());
         // TODO check cast
         auto diff = static_cast<ptrdiff_t>(std::min(predictions.size(), count + rated.size()));
         std::ranges::partial_sort(predictions, predictions.begin() + diff, [](const std::pair<size_t, float>& a, const std::pair<size_t, float>& b) {
