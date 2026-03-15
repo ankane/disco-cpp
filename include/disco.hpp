@@ -222,11 +222,7 @@ inline void least_squares_cg(LilMatrix& cui, DenseMatrix& x, DenseMatrix& y, flo
         std::vector<float> r = yty.dot(xi);
         neg(r);
         for (auto [i, confidence] : row_vec) {
-            scaled_add(
-                r,
-                confidence - (confidence - 1.0f) * dot(y.row(i), xi),
-                y.row(i)
-            );
+            scaled_add(r, confidence - (confidence - 1.0f) * dot(y.row(i), xi), y.row(i));
         }
 
         std::vector<float> p(r);
@@ -454,24 +450,12 @@ class Recommender {
 
     /// Returns recommendations for an item.
     std::vector<std::pair<U, float>> item_recs(const U& item_id, size_t count = 5) const {
-        return similar<U>(
-            item_map_,
-            item_factors_,
-            item_norms_,
-            item_id,
-            count
-        );
+        return similar<U>(item_map_, item_factors_, item_norms_, item_id, count);
     }
 
     /// Returns similar users.
     std::vector<std::pair<T, float>> similar_users(const T& user_id, size_t count = 5) const {
-        return similar<T>(
-            user_map_,
-            user_factors_,
-            user_norms_,
-            user_id,
-            count
-        );
+        return similar<T>(user_map_, user_factors_, user_norms_, user_id, count);
     }
 
     /// Returns user ids.
