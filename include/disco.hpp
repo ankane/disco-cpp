@@ -526,7 +526,12 @@ class Recommender {
         detail::DenseMatrix&& item_factors
     ) : user_map_{std::move(user_map)}, item_map_{std::move(item_map)}, rated_{std::move(rated)}, global_mean_{global_mean}, user_factors_{std::move(user_factors)}, item_factors_{std::move(item_factors)} {}
 
-    static detail::DenseMatrix create_factors(size_t rows, size_t cols, std::mt19937_64& prng, float end_range) {
+    static detail::DenseMatrix create_factors(
+        size_t rows,
+        size_t cols,
+        std::mt19937_64& prng,
+        float end_range
+    ) {
         detail::DenseMatrix m{rows, cols};
         std::uniform_real_distribution<float> dist(0, end_range);
         for (size_t i = 0; i < m.rows; i++) {
