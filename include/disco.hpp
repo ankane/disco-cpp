@@ -279,7 +279,13 @@ inline std::vector<size_t> sample(std::mt19937_64& prng, size_t n) {
 }
 
 template<typename T>
-std::vector<std::pair<T, float>> similar(const Map<T>& map, const DenseMatrix& factors, const std::vector<float>& norms, const T& id, size_t count) {
+std::vector<std::pair<T, float>> similar(
+    const Map<T>& map,
+    const DenseMatrix& factors,
+    const std::vector<float>& norms,
+    const T& id,
+    size_t count
+) {
     std::optional<size_t> io = map.get(id);
     if (!io) {
         return std::vector<std::pair<T, float>>();
@@ -375,12 +381,18 @@ template<typename T, typename U>
 class Recommender {
   public:
     /// Creates a recommender with explicit feedback.
-    static Recommender<T, U> fit_explicit(const Dataset<T, U>& train_set, const RecommenderOptions& options = RecommenderOptions()) {
+    static Recommender<T, U> fit_explicit(
+        const Dataset<T, U>& train_set,
+        const RecommenderOptions& options = RecommenderOptions()
+    ) {
         return fit(train_set, options, false);
     }
 
     /// Creates a recommender with implicit feedback.
-    static Recommender<T, U> fit_implicit(const Dataset<T, U>& train_set, const RecommenderOptions& options = RecommenderOptions()) {
+    static Recommender<T, U> fit_implicit(
+        const Dataset<T, U>& train_set,
+        const RecommenderOptions& options = RecommenderOptions()
+    ) {
         return fit(train_set, options, true);
     }
 
