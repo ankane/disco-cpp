@@ -67,7 +67,7 @@ void test_explicit() {
         return;
     }
 
-    auto recommender = Recommender<int, std::string>::fit_explicit(data.value(), { .factors = 20 });
+    auto recommender = Recommender<int, std::string>::fit_explicit(data.value(), {.factors = 20});
     auto recs = recommender.item_recs("Star Wars (1977)");
     assert(recs.size() == 5);
 }
@@ -78,7 +78,7 @@ void test_implicit() {
         return;
     }
 
-    auto recommender = Recommender<int, std::string>::fit_implicit(data.value(), { .factors = 20 });
+    auto recommender = Recommender<int, std::string>::fit_implicit(data.value(), {.factors = 20});
     auto recs = recommender.item_recs("Star Wars (1977)");
     assert(recs.size() == 5);
 }
@@ -142,7 +142,7 @@ void test_factors() {
     data.push(1, "B", 1.0);
     data.push(2, "B", 1.0);
 
-    auto recommender = Recommender<int, std::string>::fit_implicit(data, { .factors = 20 });
+    auto recommender = Recommender<int, std::string>::fit_implicit(data, {.factors = 20});
 
     auto user_factors = recommender.user_factors(1);
     assert(user_factors.has_value() && user_factors.value().size() == 20);
@@ -163,7 +163,7 @@ void test_callback_explicit() {
         assert(!std::isnan(info.train_loss));
         calls++;
     };
-    Recommender<int, std::string>::fit_explicit(data, { .callback = callback });
+    Recommender<int, std::string>::fit_explicit(data, {.callback = callback});
     assert(calls == 20);
 }
 
@@ -177,7 +177,7 @@ void test_callback_implicit() {
         assert(std::isnan(info.train_loss));
         calls++;
     };
-    Recommender<int, std::string>::fit_implicit(data, { .callback = callback });
+    Recommender<int, std::string>::fit_implicit(data, {.callback = callback});
     assert(calls == 20);
 }
 

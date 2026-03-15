@@ -154,7 +154,7 @@ int main() {
     }
 
     Dataset<int, std::string> data = load_movielens(movielens_path);
-    auto recommender = Recommender<int, std::string>::fit_explicit(data, { .factors = 20 });
+    auto recommender = Recommender<int, std::string>::fit_explicit(data, {.factors = 20});
 
     std::string movie{"Star Wars (1977)"};
     std::cout << "Item-based recommendations for " << movie << std::endl;
@@ -188,7 +188,7 @@ Disco uses high-performance matrix factorization.
 Specify the number of factors and iterations
 
 ```cpp
-auto recommender = Recommender<int, int>::fit_explicit(data, { .factors = 8, .iterations = 20 });
+auto recommender = Recommender<int, int>::fit_explicit(data, {.factors = 8, .iterations = 20});
 ```
 
 ## Progress
@@ -199,7 +199,7 @@ Pass a callback to show progress
 auto callback = [](const disco::FitInfo& info) {
     std::cout << info.iteration << ": " << info.train_loss << std::endl;
 };
-auto recommender = Recommender<int, int>::fit_explicit(data, { .callback = callback });
+auto recommender = Recommender<int, int>::fit_explicit(data, {.callback = callback});
 ```
 
 Note: `train_loss` is not available for implicit feedback

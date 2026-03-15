@@ -49,7 +49,7 @@ int main() {
     }
 
     Dataset<int, std::string> data = load_movielens(movielens_path);
-    auto recommender = Recommender<int, std::string>::fit_explicit(data, { .factors = 20 });
+    auto recommender = Recommender<int, std::string>::fit_explicit(data, {.factors = 20});
 
     std::string movie{"Star Wars (1977)"};
     std::cout << "Item-based recommendations for " << movie << std::endl;
