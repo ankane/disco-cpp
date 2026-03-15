@@ -629,7 +629,10 @@ class Recommender {
             float learning_rate = options.learning_rate;
             float lambda = options.regularization.value_or(0.1f);
             size_t k = factors;
-            size_t ks = std::max(static_cast<size_t>(std::round(static_cast<double>(k) * 0.08)), static_cast<size_t>(1));
+            size_t ks = std::max(
+                static_cast<size_t>(std::round(static_cast<double>(k) * 0.08)),
+                static_cast<size_t>(1)
+            );
 
             std::vector<float> g_slow(users, 1.0f);
             std::vector<float> g_fast(users, 1.0f);
