@@ -301,9 +301,13 @@ std::vector<std::pair<T, float>> similar(
     count = std::min(count, predictions.size() - 1);
     // TODO check cast
     auto diff = static_cast<ptrdiff_t>(std::min(predictions.size(), count + 1));
-    std::ranges::partial_sort(predictions, predictions.begin() + diff, [](const std::pair<size_t, float>& a, const std::pair<size_t, float>& b) {
-        return a.second > b.second;
-    });
+    std::ranges::partial_sort(
+        predictions,
+        predictions.begin() + diff,
+        [](const std::pair<size_t, float>& a, const std::pair<size_t, float>& b) {
+            return a.second > b.second;
+        }
+    );
 
     std::vector<std::pair<T, float>> recs;
     recs.reserve(count);
@@ -428,9 +432,13 @@ class Recommender {
         count = std::min(count, predictions.size() - rated.size());
         // TODO check cast
         auto diff = static_cast<ptrdiff_t>(std::min(predictions.size(), count + rated.size()));
-        std::ranges::partial_sort(predictions, predictions.begin() + diff, [](const std::pair<size_t, float>& a, const std::pair<size_t, float>& b) {
-            return a.second > b.second;
-        });
+        std::ranges::partial_sort(
+            predictions,
+            predictions.begin() + diff,
+            [](const std::pair<size_t, float>& a, const std::pair<size_t, float>& b) {
+                return a.second > b.second;
+            }
+        );
 
         std::vector<std::pair<U, float>> recs;
         recs.reserve(count);
@@ -601,16 +609,10 @@ class Recommender {
 
             for (size_t iteration = 0; iteration < options.iterations; iteration++) {
                 least_squares_cg(
-                    cui,
-                    recommender.user_factors_,
-                    recommender.item_factors_,
-                    regularization
+                    cui, recommender.user_factors_, recommender.item_factors_, regularization
                 );
                 least_squares_cg(
-                    ciu,
-                    recommender.item_factors_,
-                    recommender.user_factors_,
-                    regularization
+                    ciu, recommender.item_factors_, recommender.user_factors_, regularization
                 );
 
                 if (options.callback) {
@@ -701,10 +703,7 @@ class Recommender {
                 if (options.callback) {
                     train_loss = std::sqrt(train_loss / static_cast<float>(train_set.size()));
 
-                    FitInfo info{
-                        .iteration = iteration + 1,
-                        .train_loss = train_loss
-                    };
+                    FitInfo info{.iteration = iteration + 1, .train_loss = train_loss};
                     options.callback(info);
                 }
             }
