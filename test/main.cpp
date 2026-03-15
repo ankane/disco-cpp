@@ -15,11 +15,13 @@
 using disco::Dataset;
 using disco::Recommender;
 
-template<typename T> void assert_eq(const std::vector<T>& a, const std::vector<T>& b) {
+template<typename T>
+void assert_eq(const std::vector<T>& a, const std::vector<T>& b) {
     assert(std::equal(a.begin(), a.end(), b.begin(), b.end()));
 }
 
-template<typename T> void assert_eq(std::span<const T> a, const std::vector<T>& b) {
+template<typename T>
+void assert_eq(std::span<const T> a, const std::vector<T>& b) {
     assert(std::equal(a.begin(), a.end(), b.begin(), b.end()));
 }
 
