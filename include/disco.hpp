@@ -26,7 +26,8 @@ namespace disco {
 
 namespace detail {
 
-template<typename T> class Map {
+template<typename T>
+class Map {
   private:
     std::unordered_map<T, size_t> map;
     std::vector<T> vec;
@@ -277,7 +278,8 @@ inline std::vector<size_t> sample(std::mt19937_64& prng, size_t n) {
     return v;
 }
 
-template<typename T> std::vector<std::pair<T, float>> similar(const Map<T>& map, const DenseMatrix& factors, const std::vector<float>& norms, const T& id, size_t count) {
+template<typename T>
+std::vector<std::pair<T, float>> similar(const Map<T>& map, const DenseMatrix& factors, const std::vector<float>& norms, const T& id, size_t count) {
     std::optional<size_t> io = map.get(id);
     if (!io) {
         return std::vector<std::pair<T, float>>();
@@ -320,7 +322,8 @@ template<typename T> std::vector<std::pair<T, float>> similar(const Map<T>& map,
 } // namespace detail
 
 /// A dataset.
-template<typename T, typename U> class Dataset {
+template<typename T, typename U>
+class Dataset {
   public:
     /// Creates a new dataset.
     Dataset() = default;
@@ -368,7 +371,8 @@ struct RecommenderOptions {
 };
 
 /// A recommender.
-template<typename T, typename U> class Recommender {
+template<typename T, typename U>
+class Recommender {
   public:
     /// Creates a recommender with explicit feedback.
     static Recommender<T, U> fit_explicit(const Dataset<T, U>& train_set, const RecommenderOptions& options = RecommenderOptions()) {
