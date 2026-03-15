@@ -531,7 +531,11 @@ class Recommender {
         return m;
     }
 
-    static Recommender<T, U> fit(const Dataset<T, U>& train_set, const RecommenderOptions& options, bool implicit) {
+    static Recommender<T, U> fit(
+        const Dataset<T, U>& train_set,
+        const RecommenderOptions& options,
+        bool implicit
+    ) {
         detail::Map<T> user_map;
         detail::Map<U> item_map;
         std::vector<std::set<size_t>> rated;
