@@ -522,8 +522,7 @@ class Recommender {
         rated_{std::move(rated)},
         global_mean_{global_mean},
         user_factors_{std::move(user_factors)},
-        item_factors_{std::move(item_factors)} {
-    }
+        item_factors_{std::move(item_factors)} {}
 
     static detail::DenseMatrix create_factors(
         size_t rows,
