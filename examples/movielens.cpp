@@ -7,10 +7,7 @@
 
 #include "disco.hpp"
 
-using disco::Dataset;
-using disco::Recommender;
-
-Dataset<int, std::string> load_movielens(const std::string& path) {
+disco::Dataset<int, std::string> load_movielens(const std::string& path) {
     // read movies
     std::unordered_map<std::string, std::string> movies;
     std::ifstream movies_file{path + "/u.item"};
@@ -25,7 +22,7 @@ Dataset<int, std::string> load_movielens(const std::string& path) {
     }
 
     // read ratings and create dataset
-    Dataset<int, std::string> data;
+    disco::Dataset<int, std::string> data;
     std::ifstream ratings_file{path + "/u.data"};
     if (!ratings_file.is_open()) {
         throw std::runtime_error{"Could not open file"};
@@ -52,8 +49,8 @@ int main() {
         return 1;
     }
 
-    Dataset<int, std::string> data = load_movielens(movielens_path);
-    auto recommender = Recommender<int, std::string>::fit_explicit(data, {.factors = 20});
+    disco::Dataset<int, std::string> data = load_movielens(movielens_path);
+    auto recommender = disco::Recommender<int, std::string>::fit_explicit(data, {.factors = 20});
 
     std::string movie{"Star Wars (1977)"};
     std::cout << "Item-based recommendations for " << movie << std::endl;

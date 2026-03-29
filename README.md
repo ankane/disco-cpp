@@ -36,9 +36,7 @@ Include the header
 Prep your data in the format `user_id, item_id, value`
 
 ```cpp
-using disco::Dataset;
-
-Dataset<std::string, std::string> data;
+disco::Dataset<std::string, std::string> data;
 data.push("user_a", "item_a", 5.0);
 data.push("user_a", "item_b", 3.5);
 data.push("user_b", "item_a", 4.0);
@@ -53,15 +51,13 @@ data.push(1, "item_a", 5.0);
 If users rate items directly, this is known as explicit feedback. Fit the recommender with:
 
 ```cpp
-using disco::Recommender;
-
-auto recommender = Recommender<std::string, std::string>::fit_explicit(data);
+auto recommender = disco::Recommender<std::string, std::string>::fit_explicit(data);
 ```
 
 If users don’t rate items directly (for instance, they’re purchasing items or reading posts), this is known as implicit feedback. Use `1.0` or a value like number of purchases or page views for the dataset, and fit the recommender with:
 
 ```cpp
-auto recommender = Recommender<std::string, std::string>::fit_implicit(data);
+auto recommender = disco::Recommender<std::string, std::string>::fit_implicit(data);
 ```
 
 Get user-based recommendations - “users like you also liked”
@@ -112,10 +108,7 @@ And use:
 
 #include "disco.hpp"
 
-using disco::Dataset;
-using disco::Recommender;
-
-Dataset<int, std::string> load_movielens(const std::string& path) {
+disco::Dataset<int, std::string> load_movielens(const std::string& path) {
     // read movies
     std::unordered_map<std::string, std::string> movies;
     std::ifstream movies_file{path + "/u.item"};
@@ -130,7 +123,7 @@ Dataset<int, std::string> load_movielens(const std::string& path) {
     }
 
     // read ratings and create dataset
-    Dataset<int, std::string> data;
+    disco::Dataset<int, std::string> data;
     std::ifstream ratings_file{path + "/u.data"};
     if (!ratings_file.is_open()) {
         throw std::runtime_error{"Could not open file"};
@@ -157,8 +150,8 @@ int main() {
         return 1;
     }
 
-    Dataset<int, std::string> data = load_movielens(movielens_path);
-    auto recommender = Recommender<int, std::string>::fit_explicit(data, {.factors = 20});
+    disco::Dataset<int, std::string> data = load_movielens(movielens_path);
+    auto recommender = disco::Recommender<int, std::string>::fit_explicit(data, {.factors = 20});
 
     std::string movie{"Star Wars (1977)"};
     std::cout << "Item-based recommendations for " << movie << std::endl;
@@ -203,7 +196,7 @@ Pass a callback to show progress
 auto callback = [](const disco::FitInfo& info) {
     std::cout << info.iteration << ": " << info.train_loss << std::endl;
 };
-auto recommender = Recommender<int, int>::fit_explicit(data, {.callback = callback});
+auto recommender = disco::Recommender<int, int>::fit_explicit(data, {.callback = callback});
 ```
 
 Note: `train_loss` is not available for implicit feedback
