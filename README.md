@@ -103,10 +103,10 @@ Download the [MovieLens 100K dataset](https://grouplens.org/datasets/movielens/1
 And use:
 
 ```cpp
-#include <cassert>
 #include <cstdlib>
 #include <fstream>
 #include <iostream>
+#include <stdexcept>
 #include <string>
 #include <unordered_map>
 
@@ -119,7 +119,9 @@ Dataset<int, std::string> load_movielens(const std::string& path) {
     // read movies
     std::unordered_map<std::string, std::string> movies;
     std::ifstream movies_file{path + "/u.item"};
-    assert(movies_file.is_open());
+    if (!movies_file.is_open()) {
+        throw std::runtime_error{"Could not open file"};
+    }
     std::string line;
     while (std::getline(movies_file, line)) {
         size_t n = line.find('|');
@@ -130,7 +132,9 @@ Dataset<int, std::string> load_movielens(const std::string& path) {
     // read ratings and create dataset
     Dataset<int, std::string> data;
     std::ifstream ratings_file{path + "/u.data"};
-    assert(ratings_file.is_open());
+    if (!ratings_file.is_open()) {
+        throw std::runtime_error{"Could not open file"};
+    }
     while (std::getline(ratings_file, line)) {
         size_t n = line.find('\t');
         size_t n2 = line.find('\t', n + 1);
