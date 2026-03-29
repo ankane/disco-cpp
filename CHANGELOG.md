@@ -1,3 +1,7 @@
+## 0.1.4 (unreleased)
+
+- Removed unnecessary copying
+
 ## 0.1.3 (2025-02-01)
 
 - Fixed visibility of private functions
