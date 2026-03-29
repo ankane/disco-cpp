@@ -173,6 +173,15 @@ inline float norm(std::span<const float> a) {
     return std::sqrt(sum);
 }
 
+inline std::vector<float> norms(const DenseMatrix& factors) {
+    std::vector<float> norms;
+    norms.reserve(factors.rows);
+    for (size_t i = 0; i < factors.rows; i++) {
+        norms.push_back(norm(factors.row(i)));
+    }
+    return norms;
+}
+
 inline float dot(std::span<const float> a, std::span<const float> b) {
     float sum = 0.0;
     // TODO allow compiler to auto-vectorize
@@ -699,17 +708,8 @@ class Recommender {
             }
         }
 
-        std::vector<float> user_norms;
-        user_norms.reserve(users);
-        for (size_t i = 0; i < users; i++) {
-            user_norms.push_back(detail::norm(user_factors.row(i)));
-        }
-
-        std::vector<float> item_norms;
-        item_norms.reserve(items);
-        for (size_t i = 0; i < items; i++) {
-            item_norms.push_back(detail::norm(item_factors.row(i)));
-        }
+        std::vector<float> user_norms = detail::norms(user_factors);
+        std::vector<float> item_norms = detail::norms(item_factors);
 
         return Recommender<T, U>(
             std::move(user_map),
