@@ -602,12 +602,8 @@ class Recommender {
             float regularization = options.regularization.value_or(0.01f);
 
             for (size_t iteration = 0; iteration < options.iterations; iteration++) {
-                least_squares_cg(
-                    cui, user_factors, item_factors, regularization
-                );
-                least_squares_cg(
-                    ciu, item_factors, user_factors, regularization
-                );
+                least_squares_cg(cui, user_factors, item_factors, regularization);
+                least_squares_cg(ciu, item_factors, user_factors, regularization);
 
                 if (options.callback) {
                     FitInfo info{
