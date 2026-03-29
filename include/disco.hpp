@@ -84,7 +84,7 @@ class DenseMatrix {
         return std::span{data}.subspan(idx, cols);
     }
 
-    std::span<float> row_mut(size_t i) {
+    std::span<float> row(size_t i) {
         // subspan does not perform bounds checking
         if (i >= rows) {
             throw std::out_of_range{"row out of range"};
@@ -210,7 +210,7 @@ inline void least_squares_cg(LilMatrix& cui, DenseMatrix& x, DenseMatrix& y, flo
     size_t factors = x.cols;
     DenseMatrix yty{factors, factors};
     for (size_t i = 0; i < factors; i++) {
-        std::span<float> row = yty.row_mut(i);
+        std::span<float> row = yty.row(i);
         for (size_t j = 0; j < row.size(); j++) {
             float sum = 0.0f;
             for (size_t k = 0; k < y.rows; k++) {
@@ -225,7 +225,7 @@ inline void least_squares_cg(LilMatrix& cui, DenseMatrix& x, DenseMatrix& y, flo
     size_t u = 0;
     for (auto& row_vec : cui) {
         // start from previous iteration
-        std::span<float> xi = x.row_mut(u);
+        std::span<float> xi = x.row(u);
 
         // calculate residual r = (YtCuPu - (YtCuY.dot(Xu), without computing YtCuY
         std::vector<float> r = yty.dot(xi);
@@ -546,7 +546,7 @@ class Recommender {
         detail::DenseMatrix m{rows, cols};
         std::uniform_real_distribution<float> dist(0, end_range);
         for (size_t i = 0; i < m.rows; i++) {
-            for (auto& v : m.row_mut(i)) {
+            for (auto& v : m.row(i)) {
                 v = dist(prng);
             }
         }
@@ -647,8 +647,8 @@ class Recommender {
                 for (auto j : detail::sample(prng, train_set.size())) {
                     auto [u, v, r] = train_data.at(j);
 
-                    std::span<float> pu = user_factors.row_mut(u);
-                    std::span<float> qv = item_factors.row_mut(v);
+                    std::span<float> pu = user_factors.row(u);
+                    std::span<float> qv = item_factors.row(v);
                     float e = r - detail::dot(pu, qv);
 
                     // slow learner
