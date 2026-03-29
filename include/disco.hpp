@@ -515,14 +515,18 @@ class Recommender {
         std::vector<std::set<size_t>>&& rated,
         float global_mean,
         detail::DenseMatrix&& user_factors,
-        detail::DenseMatrix&& item_factors
+        detail::DenseMatrix&& item_factors,
+        std::vector<float>&& user_norms,
+        std::vector<float>&& item_norms
     ) :
         user_map_{std::move(user_map)},
         item_map_{std::move(item_map)},
         rated_{std::move(rated)},
         global_mean_{global_mean},
         user_factors_{std::move(user_factors)},
-        item_factors_{std::move(item_factors)} {}
+        item_factors_{std::move(item_factors)},
+        user_norms_{std::move(user_norms)},
+        item_norms_{std::move(item_norms)} {}
 
     static detail::DenseMatrix create_factors(
         size_t rows,
@@ -591,15 +595,6 @@ class Recommender {
         detail::DenseMatrix user_factors = create_factors(users, factors, prng, end_range);
         detail::DenseMatrix item_factors = create_factors(items, factors, prng, end_range);
 
-        auto recommender = Recommender<T, U>(
-            std::move(user_map),
-            std::move(item_map),
-            std::move(rated),
-            global_mean,
-            std::move(user_factors),
-            std::move(item_factors)
-        );
-
         if (implicit) {
             // conjugate gradient method
             // https://www.benfrederickson.com/fast-implicit-matrix-factorization/
@@ -608,10 +603,10 @@ class Recommender {
 
             for (size_t iteration = 0; iteration < options.iterations; iteration++) {
                 least_squares_cg(
-                    cui, recommender.user_factors_, recommender.item_factors_, regularization
+                    cui, user_factors, item_factors, regularization
                 );
                 least_squares_cg(
-                    ciu, recommender.item_factors_, recommender.user_factors_, regularization
+                    ciu, item_factors, user_factors, regularization
                 );
 
                 if (options.callback) {
@@ -647,8 +642,8 @@ class Recommender {
                 for (auto j : detail::sample(prng, train_set.size())) {
                     auto [u, v, r] = train_data.at(j);
 
-                    std::span<float> pu = recommender.user_factors_.row_mut(u);
-                    std::span<float> qv = recommender.item_factors_.row_mut(v);
+                    std::span<float> pu = user_factors.row_mut(u);
+                    std::span<float> qv = item_factors.row_mut(v);
                     float e = r - detail::dot(pu, qv);
 
                     // slow learner
@@ -708,15 +703,28 @@ class Recommender {
             }
         }
 
+        std::vector<float> user_norms;
+        user_norms.reserve(users);
         for (size_t i = 0; i < users; i++) {
-            recommender.user_norms_.push_back(detail::norm(recommender.user_factors_.row(i)));
+            user_norms.push_back(detail::norm(user_factors.row(i)));
         }
 
+        std::vector<float> item_norms;
+        item_norms.reserve(items);
         for (size_t i = 0; i < items; i++) {
-            recommender.item_norms_.push_back(detail::norm(recommender.item_factors_.row(i)));
+            item_norms.push_back(detail::norm(item_factors.row(i)));
         }
 
-        return recommender;
+        return Recommender<T, U>(
+            std::move(user_map),
+            std::move(item_map),
+            std::move(rated),
+            global_mean,
+            std::move(user_factors),
+            std::move(item_factors),
+            std::move(user_norms),
+            std::move(item_norms)
+        );
     }
 };
 
