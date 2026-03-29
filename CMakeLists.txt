@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.18)
 
-project(disco VERSION 0.1.3 LANGUAGES CXX)
+project(disco VERSION 0.1.4 LANGUAGES CXX)
 
 include(GNUInstallDirs)
 

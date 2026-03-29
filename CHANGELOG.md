@@ -1,4 +1,4 @@
-## 0.1.4 (unreleased)
+## 0.1.4 (2026-03-28)
 
 - Removed unnecessary copying
 
