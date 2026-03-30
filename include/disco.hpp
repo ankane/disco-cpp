@@ -21,6 +21,11 @@
 #include <unordered_map>
 #include <utility>
 #include <vector>
+#include <version>
+
+#if defined(__cpp_lib_ranges_chunk) || defined(__cpp_lib_ranges_enumerate) || defined(__cpp_lib_ranges_zip)
+#include <ranges>
+#endif
 
 namespace disco {
 
@@ -93,9 +98,29 @@ class DenseMatrix {
         return std::span{data}.subspan(idx, cols);
     }
 
+#if defined(__cpp_lib_ranges_chunk)
+    auto rows_() const {
+        return std::views::chunk(data, cols);
+    }
+
+    auto rows_() {
+        return std::views::chunk(data, cols);
+    }
+#endif
+
     std::vector<float> dot(std::span<const float> x) const {
         std::vector<float> res;
         res.reserve(rows);
+        // TODO allow compiler to auto-vectorize
+#if defined(__cpp_lib_ranges_chunk) && defined(__cpp_lib_ranges_zip)
+        for (const auto& r : rows_()) {
+            float sum = 0.0;
+            for (const auto& [rj, xj] : std::views::zip(r, x)) {
+                sum += rj * xj;
+            }
+            res.push_back(sum);
+        }
+#else
         for (size_t i = 0; i < rows; i++) {
             std::span<const float> r = row(i);
             float sum = 0.0;
@@ -104,6 +129,7 @@ class DenseMatrix {
             }
             res.push_back(sum);
         }
+#endif
         return res;
     }
 };
@@ -176,25 +202,43 @@ inline float norm(std::span<const float> a) {
 inline std::vector<float> norms(const DenseMatrix& factors) {
     std::vector<float> norms;
     norms.reserve(factors.rows);
+#if defined(__cpp_lib_ranges_chunk)
+    for (const auto& row : factors.rows_()) {
+        norms.push_back(norm(row));
+    }
+#else
     for (size_t i = 0; i < factors.rows; i++) {
         norms.push_back(norm(factors.row(i)));
     }
+#endif
     return norms;
 }
 
 inline float dot(std::span<const float> a, std::span<const float> b) {
     float sum = 0.0;
     // TODO allow compiler to auto-vectorize
+#if defined(__cpp_lib_ranges_zip)
+    for (const auto& [ai, bi] : std::views::zip(a, b)) {
+        sum += ai * bi;
+    }
+#else
     for (size_t i = 0; i < a.size(); i++) {
         sum += a[i] * b[i];
     }
+#endif
     return sum;
 }
 
 inline void scaled_add(std::span<float> x, float a, std::span<const float> v) {
+#if defined(__cpp_lib_ranges_zip)
+    for (auto&& [xi, vi] : std::views::zip(x, v)) {
+        xi += a * vi;
+    }
+#else
     for (size_t i = 0; i < x.size(); i++) {
         x[i] += a * v[i];
     }
+#endif
 }
 
 inline void neg(std::span<float> x) {
@@ -209,6 +253,18 @@ inline void least_squares_cg(LilMatrix& cui, DenseMatrix& x, DenseMatrix& y, flo
     // calculate YtY
     size_t factors = x.cols;
     DenseMatrix yty{factors, factors};
+#if defined(__cpp_lib_ranges_chunk) && defined(__cpp_lib_ranges_enumerate) && defined(__cpp_lib_ranges_zip)
+    for (auto&& [i, row] : std::views::enumerate(yty.rows_())) {
+        for (auto&& [j, rowj] : std::views::enumerate(row)) {
+            float sum = 0.0f;
+            for (const auto& r : y.rows_()) {
+                sum += r[i] * r[j];
+            }
+            rowj = sum;
+        }
+        row[i] += regularization;
+    }
+#else
     for (size_t i = 0; i < factors; i++) {
         std::span<float> row = yty.row(i);
         for (size_t j = 0; j < row.size(); j++) {
@@ -221,6 +277,7 @@ inline void least_squares_cg(LilMatrix& cui, DenseMatrix& x, DenseMatrix& y, flo
         }
         row[i] += regularization;
     }
+#endif
 
     size_t u = 0;
     for (auto& row_vec : cui) {
@@ -255,9 +312,15 @@ inline void least_squares_cg(LilMatrix& cui, DenseMatrix& x, DenseMatrix& y, flo
             }
 
             float rs = rsnew / rsold;
+#if defined(__cpp_lib_ranges_zip)
+            for (auto&& [pi, ri] : std::views::zip(p, r)) {
+                pi = ri + rs * pi;
+            }
+#else
             for (size_t i = 0; i < p.size(); i++) {
                 p.at(i) = r.at(i) + rs * p.at(i);
             }
+#endif
             rsold = rsnew;
         }
         u++;
@@ -302,11 +365,17 @@ std::vector<std::pair<T, float>> similar(
 
     std::vector<std::pair<size_t, float>> predictions;
     predictions.reserve(factors.rows);
+#if defined(__cpp_lib_ranges_chunk) && defined(__cpp_lib_ranges_zip)
+    for (const auto& [j, row, norm] : std::views::zip(std::views::iota(0), factors.rows_(), norms)) {
+        predictions.emplace_back(j, dot(row, query) / (norm * query_norm));
+    }
+#else
     for (size_t j = 0; j < factors.rows; j++) {
         std::span<const float> row = factors.row(j);
         float score = dot(row, query) / (norms.at(j) * query_norm);
         predictions.emplace_back(j, score);
     }
+#endif
     count = std::min(count, predictions.size() - 1);
     // TODO check cast
     auto diff = static_cast<ptrdiff_t>(std::min(predictions.size(), count + 1));
@@ -434,10 +503,16 @@ class Recommender {
 
         std::vector<std::pair<size_t, float>> predictions;
         predictions.reserve(item_factors_.rows);
+#if defined(__cpp_lib_ranges_chunk) && defined(__cpp_lib_ranges_enumerate)
+        for (const auto& [j, row] : std::views::enumerate(item_factors_.rows_())) {
+            predictions.emplace_back(j, detail::dot(row, query));
+        }
+#else
         for (size_t j = 0; j < item_factors_.rows; j++) {
             float score = detail::dot(item_factors_.row(j), query);
             predictions.emplace_back(j, score);
         }
+#endif
         count = std::min(count, predictions.size() - rated.size());
         // TODO check cast
         auto diff = static_cast<ptrdiff_t>(std::min(predictions.size(), count + rated.size()));
@@ -545,11 +620,19 @@ class Recommender {
     ) {
         detail::DenseMatrix m{rows, cols};
         std::uniform_real_distribution<float> dist(0, end_range);
+#if defined(__cpp_lib_ranges_chunk)
+        for (auto&& row : m.rows_()) {
+            for (auto& v : row) {
+                v = dist(prng);
+            }
+        }
+#else
         for (size_t i = 0; i < m.rows; i++) {
             for (auto& v : m.row(i)) {
                 v = dist(prng);
             }
         }
+#endif
         return m;
     }
 
@@ -658,6 +741,18 @@ class Recommender {
                     float nu = learning_rate * (1.0f / std::sqrt(g_slow.at(u)));
                     float nv = learning_rate * (1.0f / std::sqrt(h_slow.at(v)));
 
+#if defined(__cpp_lib_ranges_zip)
+                    for (auto&& [pud, qvd] : std::views::zip(pu.subspan(0, ks), qv.subspan(0, ks))) {
+                        float gud = -e * qvd + lambda * pud;
+                        float hvd = -e * pud + lambda * qvd;
+
+                        g_hat += gud * gud;
+                        h_hat += hvd * hvd;
+
+                        pud -= nu * gud;
+                        qvd -= nv * hvd;
+                    }
+#else
                     for (size_t d = 0; d < ks; d++) {
                         float gud = -e * qv[d] + lambda * pu[d];
                         float hvd = -e * pu[d] + lambda * qv[d];
@@ -668,6 +763,7 @@ class Recommender {
                         pu[d] -= nu * gud;
                         qv[d] -= nv * hvd;
                     }
+#endif
 
                     g_slow.at(u) += g_hat / static_cast<float>(ks);
                     h_slow.at(v) += h_hat / static_cast<float>(ks);
@@ -681,6 +777,18 @@ class Recommender {
                         float nu = learning_rate * (1.0f / std::sqrt(g_fast.at(u)));
                         float nv = learning_rate * (1.0f / std::sqrt(h_fast.at(v)));
 
+#if defined(__cpp_lib_ranges_zip)
+                        for (auto&& [pud, qvd] : std::views::zip(pu.subspan(ks), qv.subspan(ks))) {
+                            float gud = -e * qvd + lambda * pud;
+                            float hvd = -e * pud + lambda * qvd;
+
+                            g_hat += gud * gud;
+                            h_hat += hvd * hvd;
+
+                            pud -= nu * gud;
+                            qvd -= nv * hvd;
+                        }
+#else
                         for (size_t d = ks; d < k; d++) {
                             float gud = -e * qv[d] + lambda * pu[d];
                             float hvd = -e * pu[d] + lambda * qv[d];
@@ -691,6 +799,7 @@ class Recommender {
                             pu[d] -= nu * gud;
                             qv[d] -= nv * hvd;
                         }
+#endif
 
                         g_fast.at(u) += g_hat / static_cast<float>(k - ks);
                         h_fast.at(v) += h_hat / static_cast<float>(k - ks);
